@@ -1,6 +1,6 @@
 package crypto
 
-// xlattice_go/crypto/errors.go
+// xlCrypto_go/errors.go
 
 import (
 	e "errors"

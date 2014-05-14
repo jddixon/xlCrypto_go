@@ -1,6 +1,6 @@
 package builds
 
-// xlattice_go/crypto/builds/const.go
+// xlCrypto_go/builds/const.go
 
 const (
 	CRLF           = "\r\n"

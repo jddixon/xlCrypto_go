@@ -1,4 +1,4 @@
-// xlattice_go/crypto/sig.go
+// xlCrypto_go/sig.go
 
 package crypto
 

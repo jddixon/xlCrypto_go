@@ -1,6 +1,6 @@
 package filters
 
-// xlattice_go/crypto/filters/nibbleCounters.go
+// xlCrypto_go/filters/nibbleCounters.go
 
 import (
 	"fmt"

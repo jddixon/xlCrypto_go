@@ -1,6 +1,6 @@
 package builds
 
-// xlattice_go/crypto/builds/Item.go
+// xlCrypto_go/builds/Item.go
 
 import (
 	"encoding/base64"

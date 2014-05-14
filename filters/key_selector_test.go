@@ -1,10 +1,10 @@
 package filters
 
-// xlattice_go/crypto/filters/key_selector_test.go
+// xlCrypto_go/filters/key_selector_test.go
 
 import (
 	"fmt" // DEBUG
-	xr "github.com/jddixon/xlattice_go/rnglib"
+	xr "github.com/jddixon/rnglib_go"
 	. "launchpad.net/gocheck"
 )
 

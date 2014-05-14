@@ -2,7 +2,7 @@ package filters
 
 import (
 	"fmt" // DEBUG
-	xf "github.com/jddixon/xlattice_go/util/lfs"
+	xf "github.com/jddixon/xlUtil_go/lfs"
 	"io/ioutil"
 	gm "launchpad.net/gommap"
 	"os"

@@ -1,15 +1,14 @@
 package crypto
 
-// xlattice_go/crypto/signed_list_test.go
+// xlCrypto_go/signed_list_test.go
 
 import (
 	"bytes"
 	"crypto/rand"
 	"crypto/rsa"
 	"fmt"
-	xr "github.com/jddixon/xlattice_go/rnglib"
+	xr "github.com/jddixon/rnglib_go"
 	. "gopkg.in/check.v1"
-	//. "launchpad.net/gocheck"
 	"strings"
 )
 

@@ -1,6 +1,6 @@
 package crypto
 
-// xlattice_go/crypto/rsa_serialization.go
+// xlCrypto_go/rsa_serialization.go
 
 import (
 	"code.google.com/p/go.crypto/ssh"

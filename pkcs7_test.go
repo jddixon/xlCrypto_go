@@ -1,10 +1,10 @@
 package crypto
 
-// xlattice_go/crypto/pkcs7_test.go
+// xlCrypto_go/pkcs7_test.go
 
 import (
 	"crypto/aes"
-	xr "github.com/jddixon/xlattice_go/rnglib"
+	xr "github.com/jddixon/rnglib_go"
 	. "gopkg.in/check.v1"
 	//. "launchpad.net/gocheck"
 )

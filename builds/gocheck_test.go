@@ -1,6 +1,6 @@
 package builds
 
-// xlattice_go/crypto/builds/gocheck.go
+// xlCrypto_go/builds/gocheck.go
 
 import (
 	. "launchpad.net/gocheck"

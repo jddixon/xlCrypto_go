@@ -1,6 +1,7 @@
 package crypto
 
-// xlattice_go/crypto/mockSignedList_test.go
+// xlCrypto_go/mockSignedList_test.go
+//
 // The file has the _test suffix to limit MockSignedList's visibility
 // to test runs.
 

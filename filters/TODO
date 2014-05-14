@@ -1,4 +1,4 @@
-xlattice_go/crypto/filters/TODO
+xlCrypto_go/filters/TODO
 
 2014-02-11
     * URGENTLY NEEDS FIX: mixed up Member(), a public boolean, with

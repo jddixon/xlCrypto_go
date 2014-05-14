@@ -1,6 +1,6 @@
 package filters
 
-// xlattice_go/crypto/filters/countingBloom.go
+// xlCrypto_go/filters/countingBloom.go
 
 import (
 	"sync"

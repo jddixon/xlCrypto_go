@@ -1,6 +1,6 @@
 package filters
 
-// xlattice_go/crypto/filters/bloom_sha3_test.go
+// xlCrypto_go/filters/bloom_sha3_test.go
 
 import (
 	"fmt" // DEBUG

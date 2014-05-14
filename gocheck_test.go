@@ -1,6 +1,6 @@
 package crypto
 
-// xlattice_go/crypto/gocheck.go
+// xlCrypto_go/gocheck.go
 
 import (
 	//. "launchpad.net/gocheck"

@@ -1,6 +1,6 @@
 package crypto
 
-// xlatttice_go/crypto/signedList.go
+// xlCrypto_go/signedList.go
 
 import (
 	"bufio"
@@ -10,7 +10,7 @@ import (
 	"crypto/rsa"
 	"crypto/sha1"
 	"fmt"
-	xu "github.com/jddixon/xlattice_go/util"
+	xu "github.com/jddixon/xlUtil_go"
 	"io"
 	"time"
 )

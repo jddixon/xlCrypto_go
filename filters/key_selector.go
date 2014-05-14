@@ -2,7 +2,7 @@ package filters
 
 import (
 	"fmt"
-	xc "github.com/jddixon/xlattice_go/crypto"
+	xc "github.com/jddixon/xlCrypto_go"
 )
 
 var _ = fmt.Print

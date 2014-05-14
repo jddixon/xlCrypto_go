@@ -1,6 +1,6 @@
 package crypto
 
-// xlattice_go/crypto/rsa.go
+// xlCrypto_go/rsa.go
 
 import (
 	"bytes"

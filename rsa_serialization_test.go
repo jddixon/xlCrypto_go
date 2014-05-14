@@ -1,6 +1,6 @@
 package crypto
 
-// xlattice_go/crypto/rsa_test.go
+// xlCrypto_go/rsa_test.go
 
 import (
 	cr "crypto"
@@ -8,7 +8,7 @@ import (
 	"crypto/rsa"
 	"crypto/sha1"
 	"fmt"
-	"github.com/jddixon/xlattice_go/rnglib"
+	xr "github.com/jddixon/rnglib_go"
 	. "gopkg.in/check.v1"
 	//. "launchpad.net/gocheck"
 )
@@ -16,7 +16,7 @@ import (
 var _ = fmt.Print
 
 func (s *XLSuite) TestRSAPubKeyToFromDisk(c *C) {
-	rng := rnglib.MakeSimpleRNG()
+	rng := xr.MakeSimpleRNG()
 
 	key, err := rsa.GenerateKey(rand.Reader, 1024)
 	c.Assert(err, Equals, nil)
@@ -82,7 +82,7 @@ func (s *XLSuite) TestRSAPrivateKeyToFromDisk(c *C) {
 }
 
 func (s *XLSuite) TestRSAPubKeyToFromWire(c *C) {
-	rng := rnglib.MakeSimpleRNG()
+	rng := xr.MakeSimpleRNG()
 
 	key, err := rsa.GenerateKey(rand.Reader, 1024)
 	c.Assert(err, Equals, nil)
@@ -118,7 +118,7 @@ func (s *XLSuite) TestRSAPubKeyToFromWire(c *C) {
 	c.Assert(err, IsNil)
 }
 func (s *XLSuite) TestRSAPrivateKeyToFromWire(c *C) {
-	rng := rnglib.MakeSimpleRNG()
+	rng := xr.MakeSimpleRNG()
 
 	key, err := rsa.GenerateKey(rand.Reader, 1024)
 	c.Assert(err, Equals, nil)

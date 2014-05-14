@@ -1,6 +1,6 @@
 package filters
 
-// xlattice_go/crypto/filters/countingBloom_test.go
+// xlCrypto_go/filters/countingBloom_test.go
 
 import (
 	"fmt"

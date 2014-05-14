@@ -1,6 +1,6 @@
 package builds
 
-// xlattice_go/crypto/builds/buildList.go
+// xlCrypto_go/builds/buildList.go
 
 import (
 	"bufio"
@@ -8,7 +8,7 @@ import (
 	"crypto/rsa"
 	"encoding/base64"
 	"fmt"
-	xc "github.com/jddixon/xlattice_go/crypto"
+	xc "github.com/jddixon/xlCrypto_go"
 	"io"
 	"strings"
 )

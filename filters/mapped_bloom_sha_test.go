@@ -1,11 +1,11 @@
 package filters
 
-// xlattice_go/crypto/filters/mapped_bloom_sha3_test.go
+// xlCrypto_go/filters/mapped_bloom_sha3_test.go
 
 import (
 	"fmt"
-	xr "github.com/jddixon/xlattice_go/rnglib"
-	xf "github.com/jddixon/xlattice_go/util/lfs"
+	xr "github.com/jddixon/rnglib_go"
+	xf "github.com/jddixon/xlUtil_go/lfs"
 	. "launchpad.net/gocheck"
 	"os"
 )

@@ -1,6 +1,6 @@
 package filters
 
-// xlattice_go/crypto/gocheck.go
+// xlCrypto_go/filters/gocheck.go
 
 import (
 	. "launchpad.net/gocheck"
