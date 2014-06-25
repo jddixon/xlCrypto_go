@@ -3,6 +3,7 @@ xlCrypto_go/TODO
 2014-05-14 (SPLIT OFF FROM xlattice_go)
     * use rnglib_go instead of xlattice_go/rnglib                       * DONE
     * use xlUtil_go instead of xlattice_go/util                         * DONE
+    * whatever creates filter/tmp/ must create as readable !
 
 2014-01-09
     * Modify SignedList so that the basic functionality is identical
