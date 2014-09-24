@@ -3,7 +3,8 @@ xlCrypto_go/TODO
 2014-09-24
     REFACTORING
     * BuildList becomes abstract class
-    * UnsignedList extends BuildList
+    * UnsignedList extends BuildList                                    * ROUGH
+        - inline documentation needs improvement
     * SignedList extends UnsignedList and replaces what is now 
         BuildList
     * EncryptedUnsignedListList 

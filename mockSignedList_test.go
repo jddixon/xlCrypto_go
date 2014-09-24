@@ -100,7 +100,7 @@ func (msl *MockBuildList) String() (s string) {
 	if err == nil {
 		ss = append(ss, string(CONTENT_END))
 
-		myDigSig := base64.StdEncoding.EncodeToString(msl.digSig)
+		myDigSig := base64.StdEncoding.EncodeToString(msl.DigSig)
 		ss = append(ss, myDigSig)
 		s = string(pk) + strings.Join(ss, CRLF) + CRLF
 	}
@@ -124,7 +124,7 @@ func ParseMockBuildList(in io.Reader) (msl *MockBuildList, err error) {
 				digSig, err = base64.StdEncoding.DecodeString(string(line))
 			}
 			if err == nil || err == io.EOF {
-				msl.digSig = digSig
+				msl.DigSig = digSig
 			}
 		}
 	}

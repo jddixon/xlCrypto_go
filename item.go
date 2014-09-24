@@ -1,6 +1,6 @@
-package builds
+package crypto
 
-// xlCrypto_go/builds/Item.go
+// xlCrypto_go/item.go
 
 import (
 	"encoding/base64"
@@ -13,8 +13,8 @@ import (
  */
 
 type Item struct {
-	ehash []byte
-	path  string
+	EHash []byte
+	Path  string
 }
 
 func NewItem(hash []byte, path string) (i *Item, err error) {
@@ -25,13 +25,23 @@ func NewItem(hash []byte, path string) (i *Item, err error) {
 		err = EmptyPath
 	} else {
 		i = &Item{
-			ehash: hash,
-			path:  path,
+			EHash: hash,
+			Path:  path,
 		}
 	}
 	return
 }
 
+func (i *Item) GetHash () []byte {
+	return i.EHash
+}
+
+func (i *Item) GetPath () string {
+	return i.Path
+}
+
+// SERIALIZATION ////////////////////////////////////////////////////
+
 func (i *Item) String() string {
-	return base64.StdEncoding.EncodeToString(i.ehash) + " " + i.path
+	return base64.StdEncoding.EncodeToString(i.EHash) + " " + i.Path
 }

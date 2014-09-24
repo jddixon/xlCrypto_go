@@ -46,10 +46,13 @@ var (
  */
 
 type BuildList struct {
-	pubKey    *rsa.PublicKey
-	title     string
-	timestamp xu.Timestamp // set when signed
-	digSig    []byte
+	Content   []ItemI
+	Title     string
+	Timestamp xu.Timestamp // set when signed
+
+	// fields being moved to SignedList
+	PubKey *rsa.PublicKey
+	DigSig []byte
 }
 
 func NewBuildList(pubKey *rsa.PublicKey, title string) (
@@ -61,8 +64,8 @@ func NewBuildList(pubKey *rsa.PublicKey, title string) (
 		err = EmptyTitle
 	} else {
 		sl = &BuildList{
-			pubKey: pubKey,
-			title:  title,
+			PubKey: pubKey,
+			Title:  title,
 		}
 	}
 	return
@@ -71,24 +74,24 @@ func NewBuildList(pubKey *rsa.PublicKey, title string) (
 // PROPERTIES ///////////////////////////////////////////////////
 
 func (sl *BuildList) GetPublicKey() *rsa.PublicKey {
-	return sl.pubKey
+	return sl.PubKey
 }
 func (sl *BuildList) GetTitle() string {
-	return sl.title
+	return sl.Title
 }
 
 func (sl *BuildList) IsSigned() bool {
-	return len(sl.digSig) > 0
+	return len(sl.DigSig) > 0
 }
 
 func (sl *BuildList) GetDigSig() []byte {
-	return sl.digSig
+	return sl.DigSig
 }
 
 func (sl *BuildList) SetDigSig(val []byte) {
 	// XXX NEEDS BETTER VALIDATION
-	sl.digSig = make([]byte, len(val))
-	copy(sl.digSig, val)
+	sl.DigSig = make([]byte, len(val))
+	copy(sl.DigSig, val)
 }
 
 /**
@@ -105,10 +108,10 @@ func (sl *BuildList) GetHash() []byte {
 	d := sha1.New()
 
 	// public key in PKCS1 format
-	pk, _ := RSAPubKeyToWire(sl.pubKey)
+	pk, _ := RSAPubKeyToWire(sl.PubKey)
 	d.Write(pk)
 
-	d.Write([]byte(sl.title))
+	d.Write([]byte(sl.Title))
 	return d.Sum(nil)
 }
 
@@ -134,14 +137,14 @@ func (sl *BuildList) HashBody() (hash []byte, err error) {
 	d := sha1.New()
 
 	// public key in SSH format ---------------------------
-	pk, _ := RSAPubKeyToDisk(sl.pubKey)
+	pk, _ := RSAPubKeyToDisk(sl.PubKey)
 	d.Write(pk)
 
 	// title ----------------------------------------------
-	d.Write([]byte(sl.title))
+	d.Write([]byte(sl.Title))
 
 	// timestamp ------------------------------------------
-	d.Write([]byte(sl.timestamp.String()))
+	d.Write([]byte(sl.Timestamp.String()))
 
 	// content lines --------------------------------------
 	for i := uint(0); err == nil && i < sl.Size(); i++ {
@@ -175,22 +178,22 @@ func (sl *BuildList) Sign(skPriv *rsa.PrivateKey) (err error) {
 		digSig, hash []byte
 	)
 
-	if sl.digSig != nil {
+	if sl.DigSig != nil {
 		err = ListAlreadySigned
 	} else if skPriv == nil {
 		err = NilPrivateKey
 	} else {
-		sl.timestamp = xu.Timestamp(time.Now().UnixNano())
+		sl.Timestamp = xu.Timestamp(time.Now().UnixNano())
 		hash, err = sl.HashBody()
 		if err == nil {
 			digSig, err = rsa.SignPKCS1v15(
 				rand.Reader, skPriv, crypto.SHA1, hash)
 			if err == nil {
-				sl.digSig = digSig
+				sl.DigSig = digSig
 			}
 		}
 		if err != nil {
-			sl.timestamp = 0 // restore to default
+			sl.Timestamp = 0 // restore to default
 		}
 	}
 	return
@@ -204,12 +207,12 @@ func (sl *BuildList) Verify() (err error) {
 
 	var hash []byte
 
-	if sl.digSig == nil {
+	if sl.DigSig == nil {
 		err = UnsignedList
 	} else {
 		hash, err = sl.HashBody()
 		if err == nil {
-			err = rsa.VerifyPKCS1v15(sl.pubKey, crypto.SHA1, hash, sl.digSig)
+			err = rsa.VerifyPKCS1v15(sl.PubKey, crypto.SHA1, hash, sl.DigSig)
 		}
 	}
 	return
@@ -226,14 +229,14 @@ func (sl *BuildList) Verify() (err error) {
 func (sl *BuildList) Strings() (pk, title, timestamp string) {
 
 	// public key to SSH format -----------------------
-	pkBytes, _ := RSAPubKeyToDisk(sl.pubKey) // is newline-terminated
+	pkBytes, _ := RSAPubKeyToDisk(sl.PubKey) // is newline-terminated
 	pk = string(pkBytes)
 
 	// title ------------------------------------------
-	title = sl.title
+	title = sl.Title
 
 	// timestamp --------------------------------------
-	timestamp = sl.timestamp.String()
+	timestamp = sl.Timestamp.String()
 
 	return
 }
@@ -317,9 +320,9 @@ func ParseBuildList(in *bufio.Reader) (sl *BuildList, err error) {
 	}
 	if err == nil {
 		sl = &BuildList{
-			pubKey:    pubKey,
-			title:     title,
-			timestamp: t,
+			PubKey:    pubKey,
+			Title:     title,
+			Timestamp: t,
 		}
 	}
 	return
