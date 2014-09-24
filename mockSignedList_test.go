@@ -1,8 +1,8 @@
 package crypto
 
-// xlCrypto_go/mockSignedList_test.go
+// xlCrypto_go/mockBuildList_test.go
 //
-// The file has the _test suffix to limit MockSignedList's visibility
+// The file has the _test suffix to limit MockBuildList's visibility
 // to test runs.
 
 import (
@@ -17,31 +17,31 @@ import (
 
 var _ = fmt.Print
 
-type MockSignedList struct {
+type MockBuildList struct {
 	content []string
-	SignedList
+	BuildList
 }
 
-func NewMockSignedList(pubKey *rsa.PublicKey, title string) (
-	msl *MockSignedList, err error) {
+func NewMockBuildList(pubKey *rsa.PublicKey, title string) (
+	msl *MockBuildList, err error) {
 
-	sl, err := NewSignedList(pubKey, title)
+	sl, err := NewBuildList(pubKey, title)
 	if err == nil {
-		msl = &MockSignedList{
-			SignedList: *sl,
+		msl = &MockBuildList{
+			BuildList: *sl,
 		}
 	}
 	return
 }
 
-func (msl *MockSignedList) AddItem(s string) (n uint) {
+func (msl *MockBuildList) AddItem(s string) (n uint) {
 	n = uint(len(msl.content)) // index of this item
 	msl.content = append(msl.content, s)
 	return
 }
 
 // Return the Nth content item in string form, without any CRLF.
-func (msl *MockSignedList) Get(n uint) (s string, err error) {
+func (msl *MockBuildList) Get(n uint) (s string, err error) {
 	if n < 0 || msl.Size() <= n {
 		err = NdxOutOfRange
 	} else {
@@ -50,7 +50,7 @@ func (msl *MockSignedList) Get(n uint) (s string, err error) {
 	return
 }
 
-func (msl *MockSignedList) ReadContents(in *bufio.Reader) (err error) {
+func (msl *MockBuildList) ReadContents(in *bufio.Reader) (err error) {
 
 	for err == nil {
 		var line []byte
@@ -65,7 +65,7 @@ func (msl *MockSignedList) ReadContents(in *bufio.Reader) (err error) {
 	}
 	return
 }
-func (msl *MockSignedList) Size() uint {
+func (msl *MockBuildList) Size() uint {
 	return uint(len(msl.content))
 }
 
@@ -74,13 +74,13 @@ func (msl *MockSignedList) Size() uint {
  * If any error is encountered, this function silently returns an
  * empty string.
  */
-func (msl *MockSignedList) String() (s string) {
+func (msl *MockBuildList) String() (s string) {
 
 	var (
 		err error
 		ss  []string
 	)
-	pk, title, timestamp := msl.SignedList.Strings()
+	pk, title, timestamp := msl.BuildList.Strings()
 	ss = append(ss, title)
 	ss = append(ss, timestamp)
 
@@ -107,15 +107,15 @@ func (msl *MockSignedList) String() (s string) {
 	return
 }
 
-func ParseMockSignedList(in io.Reader) (msl *MockSignedList, err error) {
+func ParseMockBuildList(in io.Reader) (msl *MockBuildList, err error) {
 
 	var (
 		digSig, line []byte
 	)
 	bin := bufio.NewReader(in)
-	sl, err := ParseSignedList(bin)
+	sl, err := ParseBuildList(bin)
 	if err == nil {
-		msl = &MockSignedList{SignedList: *sl}
+		msl = &MockBuildList{BuildList: *sl}
 		err = msl.ReadContents(bin)
 		if err == nil {
 			// try to read the digital signature line

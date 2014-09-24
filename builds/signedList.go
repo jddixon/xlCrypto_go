@@ -21,30 +21,30 @@ var _ = fmt.Print
  * followed by a single space and then the file name, including the
  * path.  Lines end with CRLF.
  *
- * The hash for a serialized BuildList, its title key, is the 20-byte
- * SignedList hash, an SHA1-based function of the BuildList's title and
+ * The hash for a serialized SignedList, its title key, is the 20-byte
+ * BuildList hash, an SHA1-based function of the SignedList's title and
  * RSA public key.
  *
  * The digital signature in the last line is calculated from the
  * SHA1 digest of the header lines (public key, title, and timestamp
  * lines, each CRLF-terminated) and the content lines.
  */
-type BuildList struct {
+type SignedList struct {
 	content []*Item
-	xc.SignedList
+	xc.BuildList	
 }
 
-func NewBuildList(pubkey *rsa.PublicKey, title string) (
-	bl *BuildList, err error) {
+func NewSignedList(pubkey *rsa.PublicKey, title string) (
+	sList *SignedList, err error) {
 
-	sl, err := xc.NewSignedList(pubkey, title)
+	bList, err := xc.NewBuildList(pubkey, title)
 	if err == nil {
-		bl = &BuildList{SignedList: *sl}
+		sList = &SignedList{BuildList: *bList}
 	}
 	return
 }
 
-// SignedList ABSTRACT METHODS //////////////////////////////////
+// BuildList ABSTRACT METHODS //////////////////////////////////
 
 /**
  * Read a series of content lines, each consisting of a hash
@@ -54,7 +54,7 @@ func NewBuildList(pubkey *rsa.PublicKey, title string) (
  * The text of the line, excluding the line terminator, is
  * included in the digest.
  */
-func (bl *BuildList) ReadContents(in *bufio.Reader) (err error) {
+func (bl *SignedList) ReadContents(in *bufio.Reader) (err error) {
 
 	for err == nil {
 		var (
@@ -104,14 +104,14 @@ func (bl *BuildList) ReadContents(in *bufio.Reader) (err error) {
 /**
  * Return the number of content lines
  */
-func (bl *BuildList) Size() uint {
+func (bl *SignedList) Size() uint {
 	return uint(len(bl.content))
 }
 
 /**
  * Return the Nth content item in string form, without any CRLF.
  */
-func (bl *BuildList) Get(n uint) (s string, err error) {
+func (bl *SignedList) Get(n uint) (s string, err error) {
 	if n < 0 || bl.Size() <= n {
 		err = xc.NdxOutOfRange
 	} else {
@@ -121,18 +121,18 @@ func (bl *BuildList) Get(n uint) (s string, err error) {
 }
 
 /**
- * Add a content line to the BuildList.  In string form, the
+ * Add a content line to the SignedList.  In string form, the
  * content line begins with the extended hash of the Item
  * (the content hash if it is a data file) followed by a space
  * followed by the name of the Item.  If the name is a path,
  * the SEPARATOR character is a UNIX/Linux-style forward slash,
- * BuildList.SEPARATOR.
+ * SignedList.SEPARATOR.
  *
  * @param hash  extended hash of Item, its file key
  * @param name  file or path name of Item
- * @return      reference to this BuildList, to ease chaining
+ * @return      reference to this SignedList, to ease chaining
  */
-func (bl *BuildList) Add(hash []byte, name string) (err error) {
+func (bl *SignedList) Add(hash []byte, name string) (err error) {
 
 	if bl.IsSigned() {
 		err = xc.CantAddToSignedList
@@ -150,26 +150,26 @@ func (bl *BuildList) Add(hash []byte, name string) (err error) {
  * Return the SHA1 hash for the Nth Item.
  * XXX Should be modified to return a copy.
  */
-func (bl *BuildList) GetItemHash(n uint) []byte {
+func (bl *SignedList) GetItemHash(n uint) []byte {
 	return bl.content[n].ehash
 }
 
 /**
  * Returns the path + fileName for the Nth content line, in
  * a form usable with the operating system.  That is, the
- * SEPARATOR is File.SEPARATOR instead of BuildList.SEPARATOR,
+ * SEPARATOR is File.SEPARATOR instead of SignedList.SEPARATOR,
  * if there is a difference.
  *
  * @param n content line
  * @return the path + file name for the Nth Item
  */
-func (bl *BuildList) GetPath(n uint) string {
+func (bl *SignedList) GetPath(n uint) string {
 
 	// XXX NEEDS VALIDATION
 	return bl.content[n].path
 }
 
-func (bl *BuildList) String() (s string) {
+func (bl *SignedList) String() (s string) {
 
 	var (
 		err error
@@ -198,14 +198,14 @@ func (bl *BuildList) String() (s string) {
 	}
 	return
 }
-func ParseBuildList(in io.Reader) (bl *BuildList, err error) {
+func ParseSignedList(in io.Reader) (bl *SignedList, err error) {
 	var (
 		digSig, line []byte
 	)
 	bin := bufio.NewReader(in)
-	sl, err := xc.ParseSignedList(bin)
+	sl, err := xc.ParseBuildList(bin)
 	if err == nil {
-		bl = &BuildList{SignedList: *sl}
+		bl = &SignedList{BuildList: *sl}
 		err = bl.ReadContents(bin)
 		if err == nil {
 			// try to read the digital signature line

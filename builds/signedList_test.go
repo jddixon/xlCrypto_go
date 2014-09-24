@@ -33,17 +33,17 @@ const (
 		docEncodedSig
 )
 
-func (s *XLSuite) TestEmptyBuildList(c *C) {
+func (s *XLSuite) TestEmptySignedList(c *C) {
 	var (
 		err    error
-		myList *BuildList
+		myList *SignedList
 		key    *rsa.PrivateKey
 		pubKey *rsa.PublicKey
 	)
 	key, err = rsa.GenerateKey(rand.Reader, 1024)
 	c.Assert(err, IsNil)
 	pubKey = &key.PublicKey
-	myList, err = NewBuildList(pubKey, "document 1")
+	myList, err = NewSignedList(pubKey, "document 1")
 	c.Assert(err, IsNil)
 	c.Assert(myList, NotNil)
 	c.Assert(myList.Size(), Equals, uint(0))
@@ -57,10 +57,10 @@ func (s *XLSuite) TestEmptyBuildList(c *C) {
 	c.Assert(err, Equals, xc.ListAlreadySigned)
 }
 
-func (s *XLSuite) TestGeneratedBuildList(c *C) {
+func (s *XLSuite) TestGeneratedSignedList(c *C) {
 	var (
 		err    error
-		myList *BuildList
+		myList *SignedList
 		key    *rsa.PrivateKey
 		pubKey *rsa.PublicKey
 	)
@@ -78,7 +78,7 @@ func (s *XLSuite) TestGeneratedBuildList(c *C) {
 	key, err = rsa.GenerateKey(rand.Reader, 1024)
 	c.Assert(err, IsNil)
 	pubKey = &key.PublicKey
-	myList, err = NewBuildList(pubKey, "document 1")
+	myList, err = NewSignedList(pubKey, "document 1")
 	c.Assert(err, IsNil)
 	c.Assert(myList, NotNil)
 	c.Assert(myList.Size(), Equals, uint(0))
@@ -114,7 +114,7 @@ func (s *XLSuite) TestGeneratedBuildList(c *C) {
 
 	myDoc := myList.String()
 	reader := strings.NewReader(myDoc)
-	list2, err := ParseBuildList(reader)
+	list2, err := ParseSignedList(reader)
 	c.Assert(err, IsNil)
 	c.Assert(list2, NotNil)
 	c.Assert(list2.Size(), Equals, uint(4))

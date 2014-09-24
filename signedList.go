@@ -23,7 +23,7 @@ var (
 )
 
 /**
- * In its serialized form a SignedList consists of a public key line,
+ * In its serialized form a BuildList consists of a public key line,
  * a title line, a timestamp line, a number of content lines, and a
  * digital signature.  Each of the lines ends with a CR-LF sequence.
  * A blank line follows the last content line.  The timestamp (in
@@ -31,11 +31,11 @@ var (
  * was signed using the RSA private key corresponding to the key in
  * the public key line.
  *
- * The SHA1withRSA digital signature is on the entire SignedList excluding
+ * The SHA1withRSA digital signature is on the entire BuildList excluding
  * the digital signature line.  All line endings are converted to
  * CRLF before taking the digital signature.
  *
- * The SignedList itself has a 20-byte extended hash, the 20-byte SHA1
+ * The BuildList itself has a 20-byte extended hash, the 20-byte SHA1
  * digest of a function of the public key and the title.  This means
  * that the owner of the RSA key can create any number of documents
  * with the same hash but different timestamps with the intention
@@ -45,22 +45,22 @@ var (
  * What the content line contains varies between subclasses.
  */
 
-type SignedList struct {
+type BuildList struct {
 	pubKey    *rsa.PublicKey
 	title     string
 	timestamp xu.Timestamp // set when signed
 	digSig    []byte
 }
 
-func NewSignedList(pubKey *rsa.PublicKey, title string) (
-	sl *SignedList, err error) {
+func NewBuildList(pubKey *rsa.PublicKey, title string) (
+	sl *BuildList, err error) {
 
 	if pubKey == nil {
 		err = NilPublicKey
 	} else if title == "" {
 		err = EmptyTitle
 	} else {
-		sl = &SignedList{
+		sl = &BuildList{
 			pubKey: pubKey,
 			title:  title,
 		}
@@ -70,29 +70,29 @@ func NewSignedList(pubKey *rsa.PublicKey, title string) (
 
 // PROPERTIES ///////////////////////////////////////////////////
 
-func (sl *SignedList) GetPublicKey() *rsa.PublicKey {
+func (sl *BuildList) GetPublicKey() *rsa.PublicKey {
 	return sl.pubKey
 }
-func (sl *SignedList) GetTitle() string {
+func (sl *BuildList) GetTitle() string {
 	return sl.title
 }
 
-func (sl *SignedList) IsSigned() bool {
+func (sl *BuildList) IsSigned() bool {
 	return len(sl.digSig) > 0
 }
 
-func (sl *SignedList) GetDigSig() []byte {
+func (sl *BuildList) GetDigSig() []byte {
 	return sl.digSig
 }
 
-func (sl *SignedList) SetDigSig(val []byte) {
+func (sl *BuildList) SetDigSig(val []byte) {
 	// XXX NEEDS BETTER VALIDATION
 	sl.digSig = make([]byte, len(val))
 	copy(sl.digSig, val)
 }
 
 /**
- * Return this SignedList's SHA1 hash, a byte array 20 bytes
+ * Return this BuildList's SHA1 hash, a byte array 20 bytes
  * long.  The hash is over first the public key in its 'wire' form
  * and then over the title.
  *
@@ -100,7 +100,7 @@ func (sl *SignedList) SetDigSig(val []byte) {
  * the two must be reconciled.
  */
 
-func (sl *SignedList) GetHash() []byte {
+func (sl *BuildList) GetHash() []byte {
 
 	d := sha1.New()
 
@@ -119,7 +119,7 @@ func (sl *SignedList) GetHash() []byte {
  *
  * @return the number of content items
  */
-func (sl *SignedList) Size() (size uint) {
+func (sl *BuildList) Size() (size uint) {
 	// SUBCLASS MUST IMPLEMENT
 	return
 }
@@ -127,10 +127,10 @@ func (sl *SignedList) Size() (size uint) {
 // DIGITAL SIGNATURE ////////////////////////////////////////////////
 
 /**
- * Return the SHA1 hash of the SignedList, excluding the digital
+ * Return the SHA1 hash of the BuildList, excluding the digital
  * signature but expecting the timestamp to have been set.
  */
-func (sl *SignedList) HashBody() (hash []byte, err error) {
+func (sl *BuildList) HashBody() (hash []byte, err error) {
 	d := sha1.New()
 
 	// public key in SSH format ---------------------------
@@ -169,7 +169,7 @@ func (sl *SignedList) HashBody() (hash []byte, err error) {
  *
  * @param key RSAKey whose secret materials are used to sign
  */
-func (sl *SignedList) Sign(skPriv *rsa.PrivateKey) (err error) {
+func (sl *BuildList) Sign(skPriv *rsa.PrivateKey) (err error) {
 
 	var (
 		digSig, hash []byte
@@ -197,10 +197,10 @@ func (sl *SignedList) Sign(skPriv *rsa.PrivateKey) (err error) {
 }
 
 /**
- * Verify that the SignedList agrees with its digital signature,
+ * Verify that the BuildList agrees with its digital signature,
  * returning nil if it is correct and an appropriate error otherwise.
  */
-func (sl *SignedList) Verify() (err error) {
+func (sl *BuildList) Verify() (err error) {
 
 	var hash []byte
 
@@ -223,7 +223,7 @@ func (sl *SignedList) Verify() (err error) {
  * without any termination.  If any error is encountered, this
  * function silently returns an empty string.
  */
-func (sl *SignedList) Strings() (pk, title, timestamp string) {
+func (sl *BuildList) Strings() (pk, title, timestamp string) {
 
 	// public key to SSH format -----------------------
 	pkBytes, _ := RSAPubKeyToDisk(sl.pubKey) // is newline-terminated
@@ -244,7 +244,7 @@ func (sl *SignedList) Strings() (pk, title, timestamp string) {
  * with the last valid line or an empty string and io.EOF on subsequent
  * calls.
  */
-func (sl *SignedList) Get(n uint) (s string, err error) {
+func (sl *BuildList) Get(n uint) (s string, err error) {
 
 	/* SUBCLASSES MUST IMPLEMENT */
 
@@ -256,7 +256,7 @@ func (sl *SignedList) Get(n uint) (s string, err error) {
  * Reads in content lines, stripping off line endings, storing the
  * line in a subclass-defined internal buffer (conventionally "content").
  */
-func (sl *SignedList) ReadContents(*bufio.Reader) (err error) {
+func (sl *BuildList) ReadContents(*bufio.Reader) (err error) {
 
 	/* SUBCLASSES MUST IMPLEMENT */
 
@@ -280,11 +280,11 @@ func NextLineWithoutCRLF(in *bufio.Reader) (line []byte, err error) {
 
 // Read the header part of a signed list that has been serialized in disk
 // format, returning a pointer to the deserialized object or an error.
-// Subclasses should call this to get a pointer to the SignedList part
+// Subclasses should call this to get a pointer to the BuildList part
 // of the subclass struct.  If the subclass is an XXXList, then expect
 // the calling routine to be ParseXXXList()
 //
-func ParseSignedList(in *bufio.Reader) (sl *SignedList, err error) {
+func ParseBuildList(in *bufio.Reader) (sl *BuildList, err error) {
 
 	var (
 		line   []byte
@@ -316,7 +316,7 @@ func ParseSignedList(in *bufio.Reader) (sl *SignedList, err error) {
 		}
 	}
 	if err == nil {
-		sl = &SignedList{
+		sl = &BuildList{
 			pubKey:    pubKey,
 			title:     title,
 			timestamp: t,
