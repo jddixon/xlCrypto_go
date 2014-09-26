@@ -32,11 +32,11 @@ func NewItem(hash []byte, path string) (i *Item, err error) {
 	return
 }
 
-func (i *Item) GetHash () []byte {
+func (i *Item) GetHash() []byte {
 	return i.EHash
 }
 
-func (i *Item) GetPath () string {
+func (i *Item) GetPath() string {
 	return i.Path
 }
 

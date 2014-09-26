@@ -5,14 +5,9 @@ package crypto
 import (
 	"bufio"
 	"bytes"
-	"crypto"
-	"crypto/rand"
-	"crypto/rsa"
 	"crypto/sha1"
 	"fmt"
-	xu "github.com/jddixon/xlUtil_go"
 	"io"
-	"time"
 )
 
 var _ = fmt.Print
@@ -46,26 +41,17 @@ var (
  */
 
 type BuildList struct {
-	Content   []ItemI
-	Title     string
-	Timestamp xu.Timestamp // set when signed
-
-	// fields being moved to SignedList
-	PubKey *rsa.PublicKey
-	DigSig []byte
+	Content []ItemI
+	Title   string
 }
 
-func NewBuildList(pubKey *rsa.PublicKey, title string) (
-	sl *BuildList, err error) {
+func NewBuildList(title string) (sl *BuildList, err error) {
 
-	if pubKey == nil {
-		err = NilPublicKey
-	} else if title == "" {
+	if title == "" {
 		err = EmptyTitle
 	} else {
 		sl = &BuildList{
-			PubKey: pubKey,
-			Title:  title,
+			Title: title,
 		}
 	}
 	return
@@ -73,25 +59,8 @@ func NewBuildList(pubKey *rsa.PublicKey, title string) (
 
 // PROPERTIES ///////////////////////////////////////////////////
 
-func (sl *BuildList) GetPublicKey() *rsa.PublicKey {
-	return sl.PubKey
-}
-func (sl *BuildList) GetTitle() string {
-	return sl.Title
-}
-
-func (sl *BuildList) IsSigned() bool {
-	return len(sl.DigSig) > 0
-}
-
-func (sl *BuildList) GetDigSig() []byte {
-	return sl.DigSig
-}
-
-func (sl *BuildList) SetDigSig(val []byte) {
-	// XXX NEEDS BETTER VALIDATION
-	sl.DigSig = make([]byte, len(val))
-	copy(sl.DigSig, val)
+func (bl *BuildList) GetTitle() string {
+	return bl.Title
 }
 
 /**
@@ -99,19 +68,17 @@ func (sl *BuildList) SetDigSig(val []byte) {
  * long.  The hash is over first the public key in its 'wire' form
  * and then over the title.
  *
+ * Subclass must implement.
+ *
  * XXX This is completely different from the current Java implementation;
  * the two must be reconciled.
  */
 
-func (sl *BuildList) GetHash() []byte {
+func (bl *BuildList) GetHash() []byte {
 
 	d := sha1.New()
 
-	// public key in PKCS1 format
-	pk, _ := RSAPubKeyToWire(sl.PubKey)
-	d.Write(pk)
-
-	d.Write([]byte(sl.Title))
+	d.Write([]byte(bl.Title))
 	return d.Sum(nil)
 }
 
@@ -122,7 +89,7 @@ func (sl *BuildList) GetHash() []byte {
  *
  * @return the number of content items
  */
-func (sl *BuildList) Size() (size uint) {
+func (bl *BuildList) Size() (size uint) {
 	// SUBCLASS MUST IMPLEMENT
 	return
 }
@@ -133,23 +100,16 @@ func (sl *BuildList) Size() (size uint) {
  * Return the SHA1 hash of the BuildList, excluding the digital
  * signature but expecting the timestamp to have been set.
  */
-func (sl *BuildList) HashBody() (hash []byte, err error) {
+func (bl *BuildList) HashBody() (hash []byte, err error) {
 	d := sha1.New()
 
-	// public key in SSH format ---------------------------
-	pk, _ := RSAPubKeyToDisk(sl.PubKey)
-	d.Write(pk)
-
 	// title ----------------------------------------------
-	d.Write([]byte(sl.Title))
-
-	// timestamp ------------------------------------------
-	d.Write([]byte(sl.Timestamp.String()))
+	d.Write([]byte(bl.Title))
 
 	// content lines --------------------------------------
-	for i := uint(0); err == nil && i < sl.Size(); i++ {
+	for i := uint(0); err == nil && i < bl.Size(); i++ {
 		var line string
-		line, err = sl.Get(i)
+		line, err = bl.Get(i)
 		if err == nil || err == io.EOF {
 			d.Write([]byte(line))
 			if err == io.EOF {
@@ -164,60 +124,6 @@ func (sl *BuildList) HashBody() (hash []byte, err error) {
 	return
 }
 
-/**
- * Set a timestamp and calculate a digital signature.  First
- * calculate the SHA1 hash of the pubKey, title, timestamp,
- * and content lines, excluding the terminating CRLF in each
- * case, then encrypt that using the RSA private key supplied.
- *
- * @param key RSAKey whose secret materials are used to sign
- */
-func (sl *BuildList) Sign(skPriv *rsa.PrivateKey) (err error) {
-
-	var (
-		digSig, hash []byte
-	)
-
-	if sl.DigSig != nil {
-		err = ListAlreadySigned
-	} else if skPriv == nil {
-		err = NilPrivateKey
-	} else {
-		sl.Timestamp = xu.Timestamp(time.Now().UnixNano())
-		hash, err = sl.HashBody()
-		if err == nil {
-			digSig, err = rsa.SignPKCS1v15(
-				rand.Reader, skPriv, crypto.SHA1, hash)
-			if err == nil {
-				sl.DigSig = digSig
-			}
-		}
-		if err != nil {
-			sl.Timestamp = 0 // restore to default
-		}
-	}
-	return
-}
-
-/**
- * Verify that the BuildList agrees with its digital signature,
- * returning nil if it is correct and an appropriate error otherwise.
- */
-func (sl *BuildList) Verify() (err error) {
-
-	var hash []byte
-
-	if sl.DigSig == nil {
-		err = UnsignedList
-	} else {
-		hash, err = sl.HashBody()
-		if err == nil {
-			err = rsa.VerifyPKCS1v15(sl.PubKey, crypto.SHA1, hash, sl.DigSig)
-		}
-	}
-	return
-}
-
 // SERIALIZATION ////////////////////////////////////////////////
 
 /**
@@ -226,17 +132,10 @@ func (sl *BuildList) Verify() (err error) {
  * without any termination.  If any error is encountered, this
  * function silently returns an empty string.
  */
-func (sl *BuildList) Strings() (pk, title, timestamp string) {
-
-	// public key to SSH format -----------------------
-	pkBytes, _ := RSAPubKeyToDisk(sl.PubKey) // is newline-terminated
-	pk = string(pkBytes)
+func (bl *BuildList) Strings() (title  string) {
 
 	// title ------------------------------------------
-	title = sl.Title
-
-	// timestamp --------------------------------------
-	timestamp = sl.Timestamp.String()
+	title = bl.Title
 
 	return
 }
@@ -247,7 +146,7 @@ func (sl *BuildList) Strings() (pk, title, timestamp string) {
  * with the last valid line or an empty string and io.EOF on subsequent
  * calls.
  */
-func (sl *BuildList) Get(n uint) (s string, err error) {
+func (bl *BuildList) Get(n uint) (s string, err error) {
 
 	/* SUBCLASSES MUST IMPLEMENT */
 
@@ -259,7 +158,7 @@ func (sl *BuildList) Get(n uint) (s string, err error) {
  * Reads in content lines, stripping off line endings, storing the
  * line in a subclass-defined internal buffer (conventionally "content").
  */
-func (sl *BuildList) ReadContents(*bufio.Reader) (err error) {
+func (bl *BuildList) ReadContents(*bufio.Reader) (err error) {
 
 	/* SUBCLASSES MUST IMPLEMENT */
 
@@ -287,42 +186,32 @@ func NextLineWithoutCRLF(in *bufio.Reader) (line []byte, err error) {
 // of the subclass struct.  If the subclass is an XXXList, then expect
 // the calling routine to be ParseXXXList()
 //
-func ParseBuildList(in *bufio.Reader) (sl *BuildList, err error) {
+func ParseBuildList(in *bufio.Reader) (bl *BuildList, err error) {
 
 	var (
-		line   []byte
-		pubKey *rsa.PublicKey
-		title  string
-		t      xu.Timestamp // binary form
+		line  []byte
+		title string
 	)
 
 	line, err = NextLineWithoutCRLF(in)
 	if err == nil {
-		pubKey, err = RSAPubKeyFromDisk(line)
+		line, err = NextLineWithoutCRLF(in)
 		if err == nil {
+			title = string(line)
 			line, err = NextLineWithoutCRLF(in)
 			if err == nil {
-				title = string(line)
 				line, err = NextLineWithoutCRLF(in)
 				if err == nil {
-					t, err = xu.ParseTimestamp(string(line))
-					if err == nil {
-						line, err = NextLineWithoutCRLF(in)
-						if err == nil {
-							if !bytes.Equal(line, CONTENT_START) {
-								err = MissingContentStart
-							}
-						}
+					if !bytes.Equal(line, CONTENT_START) {
+						err = MissingContentStart
 					}
 				}
 			}
 		}
 	}
 	if err == nil {
-		sl = &BuildList{
-			PubKey:    pubKey,
+		bl = &BuildList{
 			Title:     title,
-			Timestamp: t,
 		}
 	}
 	return

@@ -74,7 +74,7 @@ func (s *XLSuite) TestMappedInserts(c *C) {
 	if VERBOSITY > 0 {
 		fmt.Println("TEST_MAPPED_INSERTS")
 	}
-	err := os.MkdirAll("tmp", 755)
+	err := os.MkdirAll("tmp", 0755)
 	c.Assert(err, IsNil)
 
 	m := uint(20)

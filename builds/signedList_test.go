@@ -54,7 +54,7 @@ func (s *XLSuite) TestEmptySignedList(c *C) {
 	c.Assert(myList.Verify(), IsNil)
 
 	err = myList.Sign(key)
-	c.Assert(err, Equals, xc.ListAlreadySigned)
+	c.Assert(err, Equals, ListAlreadySigned)
 }
 
 func (s *XLSuite) TestGeneratedSignedList(c *C) {
@@ -77,7 +77,9 @@ func (s *XLSuite) TestGeneratedSignedList(c *C) {
 
 	key, err = rsa.GenerateKey(rand.Reader, 1024)
 	c.Assert(err, IsNil)
+	c.Assert(key, NotNil)
 	pubKey = &key.PublicKey
+	c.Assert(pubKey, NotNil)
 	myList, err = NewSignedList(pubKey, "document 1")
 	c.Assert(err, IsNil)
 	c.Assert(myList, NotNil)
@@ -112,14 +114,18 @@ func (s *XLSuite) TestGeneratedSignedList(c *C) {
 	err = myList.Verify()
 	c.Assert(err, IsNil)
 
-	myDoc := myList.String()
+	myDoc, err := myList.String()
+	c.Assert(err, IsNil)
 	reader := strings.NewReader(myDoc)
 	list2, err := ParseSignedList(reader)
 	c.Assert(err, IsNil)
 	c.Assert(list2, NotNil)
 	c.Assert(list2.Size(), Equals, uint(4))
 	c.Assert(list2.IsSigned(), Equals, true) // FAILS
-	c.Assert(list2.String(), Equals, myDoc)
+
+	str, err := list2.String()
+	c.Assert(err, IsNil)
+	c.Assert(str, Equals, myDoc)
 	c.Assert(list2.Verify(), IsNil)
 
 	// test item gets - sloppy naming, so can't loop :-(

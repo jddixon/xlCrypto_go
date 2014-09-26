@@ -1,21 +1,34 @@
 xlCrypto_go/TODO
 
+2014-09-25
+    * FIX: buildList_test line 46 feeds header without timestamp
+        to ParseBuildList()
+
 2014-09-24
     REFACTORING
     * BuildList becomes abstract class
+        - move PubKey and DigSig fields to builds/SignedList
+        - this breaks BuildList.GetHash()
+        - so GetHash() must be implemented in the child class
+
     * UnsignedList extends BuildList                                    * ROUGH
         - inline documentation needs improvement
     * SignedList extends UnsignedList and replaces what is now 
         BuildList
     * EncryptedUnsignedListList 
+        - extends BuildList
         - this is a buildlist including content keys for files in 
             the list; the list itself is not encrypted
-    * EncryptedSignedList; extends SignedList
+    * EncryptedSignedList; extends EncryptedUnsignedList
+
+    * Either fix or drop MockBuildList; in its current form it          * DONE
+        attempts to use a simple string as a content line but           * DONE
+        ItemI need GetHash(), GetPath()                                 * DONE
 
 2014-05-14 (SPLIT OFF FROM xlattice_go)
     * use rnglib_go instead of xlattice_go/rnglib                       * DONE
     * use xlUtil_go instead of xlattice_go/util                         * DONE
-    * whatever creates filter/tmp/ must create as readable !
+    * whatever creates filter/tmp/ must create as readable !            * DONE
 
 2014-01-09
     * Modify SignedList so that the basic functionality is identical

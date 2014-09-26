@@ -5,7 +5,6 @@ package builds
 import (
 	"bufio"
 	"bytes"
-	"crypto/rsa"
 	"encoding/base64"
 	"fmt"
 	xc "github.com/jddixon/xlCrypto_go"
@@ -33,10 +32,10 @@ type UnsignedList struct {
 	xc.BuildList
 }
 
-func NewUnsignedList(pubkey *rsa.PublicKey, title string) (
+func NewUnsignedList(title string) (
 	sList *UnsignedList, err error) {
 
-	bList, err := xc.NewBuildList(pubkey, title)
+	bList, err := xc.NewBuildList(title)
 	if err == nil {
 		sList = &UnsignedList{BuildList: *bList}
 	}
@@ -172,9 +171,8 @@ func (bl *UnsignedList) String() (s string) {
 	var (
 		err error
 	)
-	pubKey, title, timestamp := bl.Strings()
+	title, timestamp := bl.Strings()
 
-	// we leave out pubKey because it is newline-terminated
 	ss := []string{title, timestamp}
 	ss = append(ss, string(xc.CONTENT_START))
 	for i := uint(0); err == nil && i < bl.Size(); i++ {
@@ -192,7 +190,7 @@ func (bl *UnsignedList) String() (s string) {
 		ss = append(ss, string(xc.CONTENT_END))
 		myDigSig := base64.StdEncoding.EncodeToString(bl.GetDigSig())
 		ss = append(ss, myDigSig)
-		s = string(pubKey) + strings.Join(ss, CRLF) + CRLF
+		s = strings.Join(ss, CRLF) + CRLF
 	}
 	return
 }

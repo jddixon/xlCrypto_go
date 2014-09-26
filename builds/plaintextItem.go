@@ -33,11 +33,11 @@ func NewPlaintextItem(hash []byte, path string) (i *PlaintextItem, err error) {
 	return
 }
 
-func (i *PlaintextItem) GetHash () []byte {
+func (i *PlaintextItem) GetHash() []byte {
 	return i.EHash
 }
 
-func (i *PlaintextItem) GetPath () string {
+func (i *PlaintextItem) GetPath() string {
 	return i.Path
 }
 
