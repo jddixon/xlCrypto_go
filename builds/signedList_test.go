@@ -113,9 +113,9 @@ func (s *XLSuite) TestGeneratedSignedList(c *C) {
 	c.Assert(myList.IsSigned(), Equals, true)
 	err = myList.Verify()
 	c.Assert(err, IsNil)
-
 	myDoc, err := myList.String()
 	c.Assert(err, IsNil)
+
 	reader := strings.NewReader(myDoc)
 	list2, err := ParseSignedList(reader)
 	c.Assert(err, IsNil)

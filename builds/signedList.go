@@ -8,6 +8,7 @@ import (
 	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
+	"crypto/sha1"
 	"encoding/base64"
 	"fmt"
 	xc "github.com/jddixon/xlCrypto_go"
@@ -257,21 +258,44 @@ func (sl *SignedList) Verify() (err error) {
 	return
 }
 
+// DOCUMENT HASH ////////////////////////////////////////////////////
+
+/**
+ * Return this SignedList's SHA1 hash, a byte array 20 bytes
+ * long.  The hash is over first the public key in its 'wire' form
+ * and then over the title.
+ *
+ * XXX This is completely different from the current Java implementation;
+ * the two must be reconciled.
+ */
+
+func (sl *SignedList) GetHash() []byte {
+
+	d := sha1.New()
+
+	// public key in PKCS1 format
+	pk, _ := xc.RSAPubKeyToWire(sl.PubKey)
+	d.Write(pk)
+
+	d.Write([]byte(sl.Title))
+	return d.Sum(nil)
+}
+
 // SERIALIZATION ////////////////////////////////////////////////////
 
-func (bl *SignedList) String() (s string, err error) {
+func (sList *SignedList) String() (s string, err error) {
 
-	if bl.PubKey == nil {
+	if sList.PubKey == nil {
 		err = NilPublicKey
 	} else {
-		pubKey, title, timestamp := bl.Strings()
+		pubKey, title, timestamp := sList.Strings()
 
 		// we leave out pubKey because it is newline-terminated
 		ss := []string{title, timestamp}
 		ss = append(ss, string(xc.CONTENT_START))
-		for i := uint(0); err == nil && i < bl.Size(); i++ {
+		for i := uint(0); err == nil && i < sList.Size(); i++ {
 			var line string
-			line, err = bl.Get(i)
+			line, err = sList.Get(i)
 			if err == nil || err == io.EOF {
 				ss = append(ss, line)
 				if err == io.EOF {
@@ -282,7 +306,7 @@ func (bl *SignedList) String() (s string, err error) {
 		}
 		if err == nil {
 			ss = append(ss, string(xc.CONTENT_END))
-			myDigSig := base64.StdEncoding.EncodeToString(bl.GetDigSig())
+			myDigSig := base64.StdEncoding.EncodeToString(sList.GetDigSig())
 			ss = append(ss, myDigSig)
 			s = string(pubKey) + strings.Join(ss, CRLF) + CRLF
 		}
@@ -347,7 +371,7 @@ func (bl *SignedList) Strings() (pk, title, timestamp string) {
 // of the subclass struct.  If the subclass is an XXXList, then expect
 // the calling routine to be ParseXXXList()
 //
-func ParseSignedList(in *bufio.Reader) (sl *SignedList, err error) {
+func ParseSignedList(in io.Reader) (sList *SignedList, err error) {
 
 	var (
 		line   []byte
@@ -355,19 +379,21 @@ func ParseSignedList(in *bufio.Reader) (sl *SignedList, err error) {
 		title  string
 		t      xu.Timestamp // binary form
 	)
+	bin := bufio.NewReader(in)
 
-	line, err = xc.NextLineWithoutCRLF(in)
+	// Read the header part -----------------------------------------
+	line, err = xc.NextLineWithoutCRLF(bin)
 	if err == nil {
 		pubKey, err = xc.RSAPubKeyFromDisk(line)
 		if err == nil {
-			line, err = xc.NextLineWithoutCRLF(in)
+			line, err = xc.NextLineWithoutCRLF(bin)
 			if err == nil {
 				title = string(line)
-				line, err = xc.NextLineWithoutCRLF(in)
+				line, err = xc.NextLineWithoutCRLF(bin)
 				if err == nil {
 					t, err = xu.ParseTimestamp(string(line))
 					if err == nil {
-						line, err = xc.NextLineWithoutCRLF(in)
+						line, err = xc.NextLineWithoutCRLF(bin)
 						if err == nil {
 							if !bytes.Equal(line, xc.CONTENT_START) {
 								err = xc.MissingContentStart
@@ -378,11 +404,34 @@ func ParseSignedList(in *bufio.Reader) (sl *SignedList, err error) {
 			}
 		}
 	}
+
+	// Build and populate the SignedList object ---------------------
 	if err == nil {
-		sl = &SignedList{
-			PubKey:    pubKey,
-			Title:     title,
-			Timestamp: t,
+		var bList *xc.BuildList
+		bList, err = xc.NewBuildList(title)
+		if err == nil {
+			sList = &SignedList{
+				PubKey:    pubKey,
+				Timestamp: t,
+				BuildList: *bList,
+			}
+			// Read the content lines and then the dig sig ----------
+			err = sList.ReadContents(bin)
+			if err == nil {
+				// try to read the digital signature line
+				var digSig []byte
+				line, err = xc.NextLineWithoutCRLF(bin)
+				if err == nil || err == io.EOF {
+					digSig, err = base64.StdEncoding.DecodeString(string(line))
+					if err == nil || err == io.EOF {
+						sList.SetDigSig(digSig)
+						if err == io.EOF {
+							err = nil
+						}
+					}
+				}
+			}
+
 		}
 	}
 	return

@@ -171,9 +171,10 @@ func (bl *UnsignedList) String() (s string) {
 	var (
 		err error
 	)
-	title, timestamp := bl.Strings()
+	title := bl.Strings()
 
-	ss := []string{title, timestamp}
+	// XXX POSSIBLY ADD timestamp
+	ss := []string{title}
 	ss = append(ss, string(xc.CONTENT_START))
 	for i := uint(0); err == nil && i < bl.Size(); i++ {
 		var line string
@@ -188,8 +189,6 @@ func (bl *UnsignedList) String() (s string) {
 	}
 	if err == nil {
 		ss = append(ss, string(xc.CONTENT_END))
-		myDigSig := base64.StdEncoding.EncodeToString(bl.GetDigSig())
-		ss = append(ss, myDigSig)
 		s = strings.Join(ss, CRLF) + CRLF
 	}
 	return

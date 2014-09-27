@@ -1,5 +1,10 @@
 xlCrypto_go/TODO
 
+2014-09-26
+    * consider putting timestamp back into BuildList struct
+        - plus a SetTime() call for UnsignedList 
+        - and EncryptedUnsignedList
+
 2014-09-25
     * FIX: buildList_test line 46 feeds header without timestamp
         to ParseBuildList()
@@ -7,7 +12,7 @@ xlCrypto_go/TODO
 2014-09-24
     REFACTORING
     * BuildList becomes abstract class
-        - move PubKey and DigSig fields to builds/SignedList
+        - move PubKey and DigSig fields to builds/SignedList            * DONE
         - this breaks BuildList.GetHash()
         - so GetHash() must be implemented in the child class
 

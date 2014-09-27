@@ -45,12 +45,12 @@ type BuildList struct {
 	Title   string
 }
 
-func NewBuildList(title string) (sl *BuildList, err error) {
+func NewBuildList(title string) (bl *BuildList, err error) {
 
 	if title == "" {
 		err = EmptyTitle
 	} else {
-		sl = &BuildList{
+		bl = &BuildList{
 			Title: title,
 		}
 	}
@@ -132,7 +132,7 @@ func (bl *BuildList) HashBody() (hash []byte, err error) {
  * without any termination.  If any error is encountered, this
  * function silently returns an empty string.
  */
-func (bl *BuildList) Strings() (title  string) {
+func (bl *BuildList) Strings() (title string) {
 
 	// title ------------------------------------------
 	title = bl.Title
@@ -211,7 +211,7 @@ func ParseBuildList(in *bufio.Reader) (bl *BuildList, err error) {
 	}
 	if err == nil {
 		bl = &BuildList{
-			Title:     title,
+			Title: title,
 		}
 	}
 	return
