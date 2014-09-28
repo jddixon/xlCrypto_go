@@ -1,5 +1,10 @@
 xlCrypto_go/TODO
 
+2014-09-27
+    * rearrange header so that 
+        - UnsignedBList is title, timestamp
+        - SignedBList is title, timestamp, publicKey
+
 2014-09-26
     * consider putting timestamp back into BuildList struct
         - plus a SetTime() call for UnsignedList 

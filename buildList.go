@@ -1,12 +1,13 @@
 package crypto
 
-// xlCrypto_go/signedList.go
+// xlCrypto_go/buildList.go
 
 import (
 	"bufio"
 	"bytes"
 	"crypto/sha1"
 	"fmt"
+	xu "github.com/jddixon/xlUtil_go"
 	"io"
 )
 
@@ -18,6 +19,8 @@ var (
 )
 
 /**
+ * XXX NEEDS TO BE EDITED:
+ *
  * In its serialized form a BuildList consists of a public key line,
  * a title line, a timestamp line, a number of content lines, and a
  * digital signature.  Each of the lines ends with a CR-LF sequence.
@@ -41,17 +44,21 @@ var (
  */
 
 type BuildList struct {
-	Content []ItemI
-	Title   string
+	Content   []interface{} // []ItemI
+	Title     string
+	Timestamp xu.Timestamp // set when signed
+
 }
 
-func NewBuildList(title string) (bl *BuildList, err error) {
+func NewBuildList(title string, timestamp xu.Timestamp) (
+	bl *BuildList, err error) {
 
 	if title == "" {
 		err = EmptyTitle
 	} else {
 		bl = &BuildList{
-			Title: title,
+			Title:     title,
+			Timestamp: timestamp,
 		}
 	}
 	return

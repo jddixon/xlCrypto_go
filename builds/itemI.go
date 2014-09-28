@@ -1,6 +1,6 @@
-package crypto
+package builds
 
-// xlCrypto_go/itemI.go
+// xlCrypto_go/builds/itemI.go
 
 type ItemI interface {
 	GetHash() []byte

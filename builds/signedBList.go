@@ -35,13 +35,12 @@ var _ = fmt.Print
  * lines, each CRLF-terminated) and the content lines.
  */
 type SignedList struct {
-	PubKey    *rsa.PublicKey
-	DigSig    []byte
-	Timestamp xu.Timestamp // set when signed
+	PubKey *rsa.PublicKey
+	DigSig []byte
 	xc.BuildList
 }
 
-func NewSignedList(pubkey *rsa.PublicKey, title string) (
+func NewSignedList(title string, pubkey *rsa.PublicKey) (
 	sList *SignedList, err error) {
 
 	if pubkey == nil {
@@ -49,11 +48,12 @@ func NewSignedList(pubkey *rsa.PublicKey, title string) (
 	} else if title == "" {
 		err = NilTitle
 	} else {
-		bList, err := xc.NewBuildList(title)
+		// timestamp is set when it gets signed
+		bList, err := xc.NewBuildList(title, 0)
 		if err == nil {
 			sList = &SignedList{
-				BuildList: *bList,
 				PubKey:    pubkey,
+				BuildList: *bList,
 			}
 		}
 	}
@@ -76,7 +76,7 @@ func (bl *SignedList) ReadContents(in *bufio.Reader) (err error) {
 		var (
 			hash, line []byte
 			path       string
-			item       *xc.Item
+			item       *Item
 		)
 		line, err = xc.NextLineWithoutCRLF(in)
 		if err == nil || err == io.EOF {
@@ -106,7 +106,7 @@ func (bl *SignedList) ReadContents(in *bufio.Reader) (err error) {
 					}
 				}
 				if err == nil {
-					item, err = xc.NewItem(hash, path)
+					item, err = NewItem(hash, path)
 					if err == nil {
 						bl.Content = append(bl.Content, item)
 					}
@@ -129,9 +129,9 @@ func (bl *SignedList) Size() uint {
  */
 func (bl *SignedList) Get(n uint) (s string, err error) {
 	if n < 0 || bl.Size() <= n {
-		err = xc.NdxOutOfRange
+		err = NdxOutOfRange
 	} else {
-		i := bl.Content[n].(*xc.Item)
+		i := bl.Content[n].(*Item)
 		s = i.String()
 	}
 	return
@@ -154,8 +154,8 @@ func (bl *SignedList) Add(hash []byte, name string) (err error) {
 	if bl.IsSigned() {
 		err = CantAddToSignedList
 	} else {
-		var item *xc.Item
-		item, err = xc.NewItem(hash, name)
+		var item *Item
+		item, err = NewItem(hash, name)
 		if err == nil {
 			bl.Content = append(bl.Content, item)
 		}
@@ -168,7 +168,7 @@ func (bl *SignedList) Add(hash []byte, name string) (err error) {
  * XXX Should be modified to return a copy.
  */
 func (bl *SignedList) GetItemHash(n uint) []byte {
-	i := bl.Content[n].(*xc.Item)
+	i := bl.Content[n].(*Item)
 	return i.EHash
 }
 
@@ -184,7 +184,7 @@ func (bl *SignedList) GetItemHash(n uint) []byte {
 func (bl *SignedList) GetPath(n uint) string {
 
 	// XXX NEEDS VALIDATION
-	i := bl.Content[n].(*xc.Item)
+	i := bl.Content[n].(*Item)
 	return i.Path
 }
 
@@ -288,10 +288,12 @@ func (sList *SignedList) String() (s string, err error) {
 	if sList.PubKey == nil {
 		err = NilPublicKey
 	} else {
-		pubKey, title, timestamp := sList.Strings()
+		title, timestamp, pubKey := sList.Strings()
 
-		// we leave out pubKey because it is newline-terminated
-		ss := []string{title, timestamp}
+		// pubKey is newline-terminated
+		pubKey = pubKey[:len(pubKey)-1]
+
+		ss := []string{title, timestamp, pubKey}
 		ss = append(ss, string(xc.CONTENT_START))
 		for i := uint(0); err == nil && i < sList.Size(); i++ {
 			var line string
@@ -308,7 +310,7 @@ func (sList *SignedList) String() (s string, err error) {
 			ss = append(ss, string(xc.CONTENT_END))
 			myDigSig := base64.StdEncoding.EncodeToString(sList.GetDigSig())
 			ss = append(ss, myDigSig)
-			s = string(pubKey) + strings.Join(ss, CRLF) + CRLF
+			s = strings.Join(ss, CRLF) + CRLF
 		}
 	}
 	return
@@ -322,17 +324,17 @@ func (sList *SignedList) String() (s string, err error) {
  *
  * PANICS if bl.PubKey is nil.
  */
-func (bl *SignedList) Strings() (pk, title, timestamp string) {
-
-	// public key to SSH format -----------------------
-	pkBytes, _ := xc.RSAPubKeyToDisk(bl.PubKey) // is newline-terminated
-	pk = string(pkBytes)
+func (bl *SignedList) Strings() (title, timestamp, pk string) {
 
 	// title ------------------------------------------
 	title = bl.Title
 
 	// timestamp --------------------------------------
 	timestamp = bl.Timestamp.String()
+
+	// public key to SSH format -----------------------
+	pkBytes, _ := xc.RSAPubKeyToDisk(bl.PubKey) // is newline-terminated
+	pk = string(pkBytes)
 
 	return
 }
@@ -384,14 +386,15 @@ func ParseSignedList(in io.Reader) (sList *SignedList, err error) {
 	// Read the header part -----------------------------------------
 	line, err = xc.NextLineWithoutCRLF(bin)
 	if err == nil {
-		pubKey, err = xc.RSAPubKeyFromDisk(line)
+		title = string(line)
+		line, err = xc.NextLineWithoutCRLF(bin)
 		if err == nil {
-			line, err = xc.NextLineWithoutCRLF(bin)
+			t, err = xu.ParseTimestamp(string(line))
 			if err == nil {
-				title = string(line)
 				line, err = xc.NextLineWithoutCRLF(bin)
 				if err == nil {
-					t, err = xu.ParseTimestamp(string(line))
+					line = append(line, 10) // NEWLINE
+					pubKey, err = xc.RSAPubKeyFromDisk(line)
 					if err == nil {
 						line, err = xc.NextLineWithoutCRLF(bin)
 						if err == nil {
@@ -408,11 +411,10 @@ func ParseSignedList(in io.Reader) (sList *SignedList, err error) {
 	// Build and populate the SignedList object ---------------------
 	if err == nil {
 		var bList *xc.BuildList
-		bList, err = xc.NewBuildList(title)
+		bList, err = xc.NewBuildList(title, t)
 		if err == nil {
 			sList = &SignedList{
 				PubKey:    pubKey,
-				Timestamp: t,
 				BuildList: *bList,
 			}
 			// Read the content lines and then the dig sig ----------

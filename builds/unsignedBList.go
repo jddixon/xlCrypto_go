@@ -8,6 +8,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	xc "github.com/jddixon/xlCrypto_go"
+	xu "github.com/jddixon/xlUtil_go"
 	"io"
 	"strings"
 )
@@ -35,11 +36,15 @@ type UnsignedList struct {
 func NewUnsignedList(title string) (
 	sList *UnsignedList, err error) {
 
-	bList, err := xc.NewBuildList(title)
+	bList, err := xc.NewBuildList(title, 0)
 	if err == nil {
 		sList = &UnsignedList{BuildList: *bList}
 	}
 	return
+}
+
+func (ul *UnsignedList) SetTimestamp(t xu.Timestamp) {
+	ul.Timestamp = t
 }
 
 // BuildList ABSTRACT METHODS //////////////////////////////////
@@ -58,7 +63,7 @@ func (bl *UnsignedList) ReadContents(in *bufio.Reader) (err error) {
 		var (
 			hash, line []byte
 			path       string
-			item       *PlaintextItem
+			item       *Item
 		)
 		line, err = xc.NextLineWithoutCRLF(in)
 		if err == nil || err == io.EOF {
@@ -88,7 +93,7 @@ func (bl *UnsignedList) ReadContents(in *bufio.Reader) (err error) {
 					}
 				}
 				if err == nil {
-					item, err = NewPlaintextItem(hash, path)
+					item, err = NewItem(hash, path)
 					if err == nil {
 						bl.Content = append(bl.Content, item)
 					}
@@ -111,9 +116,9 @@ func (bl *UnsignedList) Size() uint {
  */
 func (bl *UnsignedList) Get(n uint) (s string, err error) {
 	if n < 0 || bl.Size() <= n {
-		err = xc.NdxOutOfRange
+		err = NdxOutOfRange
 	} else {
-		ptc := bl.Content[n].(*PlaintextItem)
+		ptc := bl.Content[n].(*Item)
 		s = ptc.String()
 	}
 	return
@@ -133,8 +138,8 @@ func (bl *UnsignedList) Get(n uint) (s string, err error) {
  */
 func (bl *UnsignedList) Add(hash []byte, name string) (err error) {
 
-	var item *PlaintextItem
-	item, err = NewPlaintextItem(hash, name)
+	var item *Item
+	item, err = NewItem(hash, name)
 	if err == nil {
 		bl.Content = append(bl.Content, item)
 	}
@@ -146,7 +151,7 @@ func (bl *UnsignedList) Add(hash []byte, name string) (err error) {
  * XXX Should be modified to return a copy.
  */
 func (bl *UnsignedList) GetItemHash(n uint) []byte {
-	ptc := bl.Content[n].(*PlaintextItem)
+	ptc := bl.Content[n].(*Item)
 	return ptc.EHash
 }
 
@@ -162,7 +167,7 @@ func (bl *UnsignedList) GetItemHash(n uint) []byte {
 func (bl *UnsignedList) GetPath(n uint) string {
 
 	// XXX NEEDS VALIDATION
-	ptc := bl.Content[n].(*PlaintextItem)
+	ptc := bl.Content[n].(*Item)
 	return ptc.Path
 }
 

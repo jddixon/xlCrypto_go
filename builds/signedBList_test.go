@@ -18,18 +18,18 @@ var _ = fmt.Print
 
 // XXX HOW MUCH OF THIS IS USED ?
 const (
+	docTitle = "document 1"
+	docTime  = "2004-11-18 20:03:34"
 	// a folded RSA public key
 	docPK1    = "rsa AL0zGtdGkuJdH1vd4TaUMmRvdEBepnGfAbvZXPkdsVq367VUevbfzNL4W6u+Ks8+BksZzZPc"
 	docPK2    = "yLJsnDZr7mE/rHSwQ7la1HlSWwNDlhQtCnKTlSoqffVhofhtak/SqBOJVLkWrouaK60uCiZV0Hw"
 	docPK3    = "YTM6Pqo8sqYinA3W8mvK2tsW/ 65537"
 	docPubKey = docPK1 + FOLD + docPK2 + FOLD + docPK3
 
-	docTitle      = "document 1"
-	docTime       = "2004-11-18 20:03:34"
 	docEncodedSig = "tIQJ+7Y27eIyQCb3esTgU/AdBfPDAGEOhU/KShAo5N5dfxtjkH04N5IwvyftEJd5jM0kHB1LD1TtavoxZ0gx4eADizHcDjEpZOiO+wUHIcbGsuvLUvZvBttPPBRuRfZgZXkvvSMBX0KIwRVgFqwaRB5gzQyD2skcP2kGFBWrFdM="
-	testDoc       = docPubKey + CRLF +
-		docTitle + CRLF +
+	testDoc       = docTitle + CRLF +
 		docTime + CRLF +
+		docPubKey + CRLF +
 		docEncodedSig
 )
 
@@ -43,7 +43,7 @@ func (s *XLSuite) TestEmptySignedList(c *C) {
 	key, err = rsa.GenerateKey(rand.Reader, 1024)
 	c.Assert(err, IsNil)
 	pubKey = &key.PublicKey
-	myList, err = NewSignedList(pubKey, "document 1")
+	myList, err = NewSignedList("document 1", pubKey)
 	c.Assert(err, IsNil)
 	c.Assert(myList, NotNil)
 	c.Assert(myList.Size(), Equals, uint(0))
@@ -80,7 +80,7 @@ func (s *XLSuite) TestGeneratedSignedList(c *C) {
 	c.Assert(key, NotNil)
 	pubKey = &key.PublicKey
 	c.Assert(pubKey, NotNil)
-	myList, err = NewSignedList(pubKey, "document 1")
+	myList, err = NewSignedList("document 1", pubKey)
 	c.Assert(err, IsNil)
 	c.Assert(myList, NotNil)
 	c.Assert(myList.Size(), Equals, uint(0))

@@ -1,10 +1,9 @@
 package builds
 
-// xlCrypto_go/plaintextItem.go
+// xlCrypto_go/builds/item.go
 
 import (
 	"encoding/base64"
-	xc "github.com/jddixon/xlCrypto_go"
 )
 
 /**
@@ -13,19 +12,19 @@ import (
  * including its name.
  */
 
-type PlaintextItem struct {
+type Item struct {
 	EHash []byte
 	Path  string
 }
 
-func NewPlaintextItem(hash []byte, path string) (i *PlaintextItem, err error) {
+func NewItem(hash []byte, path string) (i *Item, err error) {
 
 	if len(hash) == 0 {
-		err = xc.EmptyHash
+		err = EmptyHash
 	} else if len(path) == 0 {
-		err = xc.EmptyPath
+		err = EmptyPath
 	} else {
-		i = &PlaintextItem{
+		i = &Item{
 			EHash: hash,
 			Path:  path,
 		}
@@ -33,16 +32,16 @@ func NewPlaintextItem(hash []byte, path string) (i *PlaintextItem, err error) {
 	return
 }
 
-func (i *PlaintextItem) GetHash() []byte {
+func (i *Item) GetHash() []byte {
 	return i.EHash
 }
 
-func (i *PlaintextItem) GetPath() string {
+func (i *Item) GetPath() string {
 	return i.Path
 }
 
 // SERIALIZATION ////////////////////////////////////////////////////
 
-func (i *PlaintextItem) String() string {
+func (i *Item) String() string {
 	return base64.StdEncoding.EncodeToString(i.EHash) + " " + i.Path
 }
