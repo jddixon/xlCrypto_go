@@ -3,6 +3,8 @@ xlCrypto_go/TODO
 2014-09-29
     * ReadContent: need to type check what's added to 
         BuildList.Content
+    * adding item to build list must clear isHashed or set digSig
+        to nil as appropriate
 
 2014-09-28
     * rename SignedList SignedBList                                     * DONE

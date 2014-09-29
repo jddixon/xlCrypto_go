@@ -4,8 +4,9 @@ package builds
 
 import (
 	"bufio"
-	//"bytes"
-	//"encoding/base64"
+	"bytes"
+	"crypto/sha1"
+	"encoding/base64"
 	"fmt"
 	xc "github.com/jddixon/xlCrypto_go"
 	xu "github.com/jddixon/xlUtil_go"
@@ -46,7 +47,8 @@ var _ = fmt.Print
  * ignored in calculating the SHA1-hash.
  */
 type UnsignedBList struct {
-	Hash []byte
+	docHash  []byte
+	isHashed bool
 	xc.BuildList
 }
 
@@ -60,7 +62,7 @@ func NewUnsignedBList(title string) (
 	return
 }
 
-func (ul *UnsignedBList) SetTimestamp(t xu.Timestamp) {
+func (ul *UnsignedBList) setTimestamp(t xu.Timestamp) {
 	ul.Timestamp = t
 }
 
@@ -106,15 +108,6 @@ func (ul *UnsignedBList) Add(hash []byte, name string) (err error) {
 		ul.Content = append(ul.Content, item)
 	}
 	return
-}
-
-/**
- * Return the SHA1 hash for the Nth Item.
- * XXX Should be modified to return a copy.
- */
-func (ul *UnsignedBList) GetItemHash(n uint) []byte {
-	ptc := ul.Content[n].(*Item)
-	return ptc.EHash
 }
 
 /**
@@ -169,22 +162,130 @@ func (ul *UnsignedBList) String() (s string, err error) {
 	}
 	if err == nil {
 		ss = append(ss, string(xc.CONTENT_END))
+		if ul.isHashed {
+			ss = append(ss, base64.StdEncoding.EncodeToString(ul.docHash))
+		}
 		s = strings.Join(ss, CRLF) + CRLF
 	}
 	return
 }
+
+// DOCUMENT HASH ////////////////////////////////////////////////////
+
+func (ul *UnsignedBList) IsHashed() bool {
+	return ul.isHashed
+}
+
+// Calculates and returns the document hash.
+func (ul *UnsignedBList) calcDocHash() []byte {
+	d := sha1.New()
+	d.Write([]byte(ul.Title))
+
+	// serialized time
+	d.Write([]byte(ul.Timestamp.String()))
+
+	// content lines
+	count := uint(len(ul.Content))
+	for n := uint(0); n < count; n++ {
+		// XXX any errors are being ignored
+		line, _ := ul.Get(n)
+		d.Write([]byte(line))
+	}
+	return d.Sum(nil)
+}
+
+/**
+ * Returns the current value of document hash.
+ */
+func (ul *UnsignedBList) GetDocHash() []byte {
+	return ul.docHash
+}
+
+// Sets the DocHash field to the actual value of the document hash.
+func (ul *UnsignedBList) SetDocHash() {
+	ul.setDocHash(ul.calcDocHash())
+}
+
+/**
+ * Sets the docHash field from the value passed.  INTERNAL USE ONLY.
+ */
+func (ul *UnsignedBList) setDocHash(val []byte) {
+	ul.docHash = val
+	ul.isHashed = true
+}
+
+/**
+ * Return whether the document hash field is correct.
+ */
+func (ul *UnsignedBList) Verify() (ok bool) {
+	if ul.isHashed {
+		actualHash := ul.calcDocHash()
+		ok = bytes.Equal(actualHash, ul.docHash)
+	}
+	return
+}
+
+// PARSE/DESERIALIZATION ////////////////////////////////////////////
+
+// Read the header part of a signed list that has been serialized in disk
+// format, returning a pointer to the deserialized object or an error.
+// Subclasses should call this to get a pointer to the BuildList part
+// of the subclass struct.  If the subclass is an XXXList, then expect
+// the calling routine to be ParseXXXList()
+//
 func ParseUnsignedBList(in io.Reader) (uList *UnsignedBList, err error) {
 
-	// var line []byte
-
+	var (
+		line  []byte
+		title string
+		t     xu.Timestamp // binary form
+	)
 	bin := bufio.NewReader(in)
-	bList, err := xc.ParseBuildList(bin)
+
+	// Read the header part -----------------------------------------
+	line, err = xc.NextLineWithoutCRLF(bin)
 	if err == nil {
-		uList = &UnsignedBList{BuildList: *bList}
-		err = ReadContents(bin, uList, false) // true = it's signed
+		title = string(line)
+		line, err = xc.NextLineWithoutCRLF(bin)
+		if err == nil {
+			t, err = xu.ParseTimestamp(string(line))
+			if err == nil {
+				line, err = xc.NextLineWithoutCRLF(bin)
+				if err == nil {
+					if !bytes.Equal(line, xc.CONTENT_START) {
+						err = xc.MissingContentStart
+					}
+				}
+			}
+		}
 	}
-	if err == io.EOF {
-		err = nil
+
+	// Build and populate the SignedBList object ---------------------
+	if err == nil {
+		var bList *xc.BuildList
+		bList, err = xc.NewBuildList(title, t)
+		if err == nil {
+			uList = &UnsignedBList{
+				BuildList: *bList,
+			}
+			// Read the content lines and then any docHash line ------
+			err = ReadContents(bin, uList, false) // true = is signed
+			if err == nil {
+				// try to read any docHash line
+				var docHash []byte
+				line, err = xc.NextLineWithoutCRLF(bin)
+				if (err == nil || err == io.EOF) && (len(line) > 0) {
+					docHash, err = base64.StdEncoding.DecodeString(string(line))
+					if err == nil || err == io.EOF {
+						uList.setDocHash(docHash)
+						if err == io.EOF {
+							err = nil
+						}
+					}
+				}
+			}
+
+		}
 	}
 	return
 }

@@ -16,7 +16,6 @@ import (
 
 var _ = fmt.Print
 
-// XXX HOW MUCH OF THIS IS USED ?
 const (
 	docTitle = "document 1"
 	docTime  = "2004-11-18 20:03:34"
@@ -115,6 +114,10 @@ func (s *XLSuite) TestGeneratedSignedBList(c *C) {
 	c.Assert(err, IsNil)
 	myDoc, err := myList.String()
 	c.Assert(err, IsNil)
+
+	// DEBUG
+	fmt.Printf("MY_DOC:\n%s", myDoc)
+	// END
 
 	reader := strings.NewReader(myDoc)
 	list2, err := ParseSignedBList(reader)

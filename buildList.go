@@ -4,7 +4,7 @@ package crypto
 
 import (
 	"bufio"
-	"bytes"
+	//"bytes"
 	"crypto/sha1"
 	"fmt"
 	xu "github.com/jddixon/xlUtil_go"
@@ -45,7 +45,7 @@ var (
 
 type BuildList struct {
 	Title     string
-	Timestamp xu.Timestamp  // set when signed
+	Timestamp xu.Timestamp  // set when signed or docHash set
 	Content   []interface{} // []ItemI
 }
 
@@ -159,43 +159,6 @@ func NextLineWithoutCRLF(in *bufio.Reader) (line []byte, err error) {
 		lineLen := len(line)
 		if lineLen > 0 && line[lineLen-1] == '\r' {
 			line = line[:len(line)-1] // drop any \r
-		}
-	}
-	return
-}
-
-// Read the header part of a signed list that has been serialized in disk
-// format, returning a pointer to the deserialized object or an error.
-// Subclasses should call this to get a pointer to the BuildList part
-// of the subclass struct.  If the subclass is an XXXList, then expect
-// the calling routine to be ParseXXXList()
-//
-func ParseBuildList(in *bufio.Reader) (bl *BuildList, err error) {
-
-	var (
-		line  []byte
-		title string
-	)
-
-	line, err = NextLineWithoutCRLF(in)
-	if err == nil {
-		line, err = NextLineWithoutCRLF(in)
-		if err == nil {
-			title = string(line)
-			line, err = NextLineWithoutCRLF(in)
-			if err == nil {
-				line, err = NextLineWithoutCRLF(in)
-				if err == nil {
-					if !bytes.Equal(line, CONTENT_START) {
-						err = MissingContentStart
-					}
-				}
-			}
-		}
-	}
-	if err == nil {
-		bl = &BuildList{
-			Title: title,
 		}
 	}
 	return

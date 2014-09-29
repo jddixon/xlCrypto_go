@@ -65,19 +65,19 @@ func NewSignedBList(title string, pubkey *rsa.PublicKey) (
 /**
  * Return the number of content lines
  */
-func (bl SignedBList) Size() uint {
-	return uint(len(bl.Content))
+func (sl SignedBList) Size() uint {
+	return uint(len(sl.Content))
 }
 
 /**
  * Return the Nth content item in string form, without any CRLF.
  */
-func (bl SignedBList) Get(n uint) (s string, err error) {
+func (sl SignedBList) Get(n uint) (s string, err error) {
 
-	if n < 0 || bl.Size() <= n {
+	if n < 0 || sl.Size() <= n {
 		err = NdxOutOfRange
 	} else {
-		i := bl.Content[n].(*Item)
+		i := sl.Content[n].(*Item)
 		s = i.String()
 	}
 	return
@@ -95,15 +95,15 @@ func (bl SignedBList) Get(n uint) (s string, err error) {
  * @param name  file or path name of Item
  * @return      reference to this SignedBList, to ease chaining
  */
-func (bl *SignedBList) Add(hash []byte, name string) (err error) {
+func (sl *SignedBList) Add(hash []byte, name string) (err error) {
 
-	if bl.IsSigned() {
+	if sl.IsSigned() {
 		err = CantAddToSignedList
 	} else {
 		var item *Item
 		item, err = NewItem(hash, name)
 		if err == nil {
-			bl.Content = append(bl.Content, item)
+			sl.Content = append(sl.Content, item)
 		}
 	}
 	return
@@ -113,8 +113,8 @@ func (bl *SignedBList) Add(hash []byte, name string) (err error) {
  * Return the SHA1 hash for the Nth Item.
  * XXX Should be modified to return a copy.
  */
-func (bl *SignedBList) GetItemHash(n uint) []byte {
-	i := bl.Content[n].(*Item)
+func (sl *SignedBList) GetItemHash(n uint) []byte {
+	i := sl.Content[n].(*Item)
 	return i.EHash
 }
 
@@ -127,10 +127,10 @@ func (bl *SignedBList) GetItemHash(n uint) []byte {
  * @param n content line
  * @return the path + file name for the Nth Item
  */
-func (bl *SignedBList) GetPath(n uint) string {
+func (sl *SignedBList) GetPath(n uint) string {
 
 	// XXX NEEDS VALIDATION
-	i := bl.Content[n].(*Item)
+	i := sl.Content[n].(*Item)
 	return i.Path
 }
 
@@ -268,50 +268,24 @@ func (sList SignedBList) String() (s string, err error) {
  *
  * If any error is encountered, this function silently returns an empty string.
  *
- * PANICS if bl.PubKey is nil.
+ * PANICS if sl.PubKey is nil.
  */
-func (bl *SignedBList) Strings() (title, timestamp, pk string) {
+func (sl *SignedBList) Strings() (title, timestamp, pk string) {
 
 	// title ------------------------------------------
-	title = bl.Title
+	title = sl.Title
 
 	// timestamp --------------------------------------
-	timestamp = bl.Timestamp.String()
+	timestamp = sl.Timestamp.String()
 
 	// public key to SSH format -----------------------
-	pkBytes, _ := xc.RSAPubKeyToDisk(bl.PubKey) // is newline-terminated
+	pkBytes, _ := xc.RSAPubKeyToDisk(sl.PubKey) // is newline-terminated
 	pk = string(pkBytes)
 
 	return
 }
 
 // PARSE/DESERIALIZATION ////////////////////////////////////////////
-
-//func ParseSignedBList(in io.Reader) (sList *SignedBList, err error) {
-//	var (
-//		digSig, line []byte
-//	)
-//	bin := bufio.NewReader(in)
-//	bList, err := xc.ParseBuildList(bin)
-//	if err == nil {
-//		sList = &SignedBList{BuildList: *bList}
-//		err = sList.ReadContents(bin)
-//		if err == nil {
-//			// try to read the digital signature line
-//			line, err = xc.NextLineWithoutCRLF(bin)
-//			if err == nil || err == io.EOF {
-//				digSig, err = base64.StdEncoding.DecodeString(string(line))
-//			}
-//			if err == nil || err == io.EOF {
-//				sList.SetDigSig(digSig)
-//			}
-//		}
-//	}
-//	if err == io.EOF {
-//		err = nil
-//	}
-//	return
-//}
 
 // Read the header part of a signed list that has been serialized in disk
 // format, returning a pointer to the deserialized object or an error.
@@ -384,3 +358,28 @@ func ParseSignedBList(in io.Reader) (sList *SignedBList, err error) {
 	}
 	return
 }
+
+// DOCUMENT HASH ////////////////////////////////////////////////////
+
+// Calculates and returns the document hash.
+func (sl *SignedBList) calcDocHash() []byte {
+	d := sha1.New()
+	d.Write([]byte(sl.Title))
+
+	// serialized time
+	d.Write([]byte(sl.Timestamp.String()))
+
+	// serialized public key, ignoring possible error
+	pk, _ := xc.RSAPubKeyToWire(sl.PubKey)
+	d.Write(pk)
+
+	// content lines
+	count := uint(len(sl.Content))
+	for n := uint(0); n < count; n++ {
+		// XXX any errors are being ignored
+		line, _ := sl.Get(n)
+		d.Write([]byte(line))
+	}
+	return d.Sum(nil)
+}
+
