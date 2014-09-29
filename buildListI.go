@@ -3,8 +3,8 @@ package crypto
 // xlatttice_go/crypto/signedListI.go
 
 import (
-	"bufio"
-	"crypto/rsa"
+	//"bufio"
+	//"crypto/rsa"
 )
 
 /**
@@ -33,7 +33,7 @@ import (
 type BuildListI interface {
 
 	/** @return a clone of the public key */
-	GetPublicKey() *rsa.PublicKey
+	//GetPublicKey() *rsa.PublicKey
 
 	GetTitle() string
 
@@ -62,7 +62,7 @@ type BuildListI interface {
 	 *
 	 * @return the number of content items
 	 */
-	Size() int
+	Size() uint
 
 	/**
 	 * Verify that the BuildList agrees with its digital signature.
@@ -79,19 +79,20 @@ type BuildListI interface {
 	 * @param n index of content item to be serialized
 	 * @return  serialized content item
 	 */
-	Get(n int) (string, error)
+	Get(n uint) (string, error)
 
 	/**
 	 * Subclasses must read in all content lines, stripping off
 	 * terminating CRLF.
 	 */
 
-	ReadContents(*bufio.Reader) error
+	// XXX Dropped 2014-09-28:
+	// ReadContents(*bufio.Reader) error
 
 	/**
 	 * Serialize the entire document.  All lines are CRLF-terminated.
 	 * Subclasses are responsible for formatting their content lines,
 	 * without any termination.
 	 */
-	String() string
+	String() (string, error)
 }

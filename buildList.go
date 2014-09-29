@@ -44,10 +44,9 @@ var (
  */
 
 type BuildList struct {
-	Content   []interface{} // []ItemI
 	Title     string
 	Timestamp xu.Timestamp // set when signed
-
+	Content   []interface{} // []ItemI
 }
 
 func NewBuildList(title string, timestamp xu.Timestamp) (
@@ -66,7 +65,7 @@ func NewBuildList(title string, timestamp xu.Timestamp) (
 
 // PROPERTIES ///////////////////////////////////////////////////
 
-func (bl *BuildList) GetTitle() string {
+func (bl BuildList) GetTitle() string {
 	return bl.Title
 }
 
@@ -81,7 +80,7 @@ func (bl *BuildList) GetTitle() string {
  * the two must be reconciled.
  */
 
-func (bl *BuildList) GetHash() []byte {
+func (bl BuildList) GetHash() []byte {
 
 	d := sha1.New()
 
@@ -96,7 +95,7 @@ func (bl *BuildList) GetHash() []byte {
  *
  * @return the number of content items
  */
-func (bl *BuildList) Size() (size uint) {
+func (bl BuildList) Size() (size uint) {
 	// SUBCLASS MUST IMPLEMENT
 	return
 }
@@ -153,7 +152,7 @@ func (bl *BuildList) Strings() (title string) {
  * with the last valid line or an empty string and io.EOF on subsequent
  * calls.
  */
-func (bl *BuildList) Get(n uint) (s string, err error) {
+func (bl BuildList) Get(n uint) (s string, err error) {
 
 	/* SUBCLASSES MUST IMPLEMENT */
 

@@ -46,6 +46,9 @@ func NewMockBuildList(title string) (
 	return
 }
 
+/**
+ * Add an item to the Content, returning its zero-based index.
+ */
 func (msl *MockBuildList) AddItem(s string) (n uint) {
 	n = uint(len(msl.Content)) // index of this item
 	mi := NewMockItem(s)

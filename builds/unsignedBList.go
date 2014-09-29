@@ -16,20 +16,37 @@ import (
 var _ = fmt.Print
 
 /**
- * Serialized, a build list is a list of files and their extended hashes.
- * Each content line starts with base64-encoded extended hash which is
- * followed by a single space and then the file name, including the
- * path.  Lines end with CRLF.
+ * 2014-09-28:
  *
- * The hash for a serialized UnsignedList, its title key, is the 20-byte
- * BuildList hash, an SHA1-based function of the UnsignedList's title and
- * RSA public key.
+ * An UnsigedBList begins with a header.  This is followed by a
+ * demarcator, then zero or more content lines, then a second 
+ * demarcator, and finally a base64-encoded SHA1 document hash.
+ * 
+ * The header consists of the document title line and a timestamp line
+ * in CCYY-MM-DD HH:MM:SS format.  Each of these is terminated with a 
+ * CRLF sequence, but the CRLF is dropped in calculating the document
+ * hash.
  *
- * The digital signature in the last line is calculated from the
- * SHA1 digest of the header lines (public key, title, and timestamp
- * lines, each CRLF-terminated) and the content lines.
+ * The Content section begins with a "# BEGIN CONTENT #" and ends with
+ * an "# END CONTENT #" line.  Each line is CRLF-terminated.  Both lines
+ * are ignored in calculating the document hash.
+ *
+ * Serialized, the Content section contains a list of files and their extended 
+ * hashes.  Each content line starts with base64-encoded extended hash 
+ * which is followed by a single space and then the file name, including 
+ * the POSIX path.  Lines end with CRLF.  The CRLF is ignored in 
+ * calculating the document hash.
+ *
+ * The extended hash in the content line is the base64-encoded SHA1 hash of 
+ * the contents of the file named.
+ * 
+ * The document hash is the base64-encodd SHA1 hash of the title line
+ * and timestamp lines (ie, the header lines) and then eah of the content
+ * lines in order.  CRLF line terminators and content demarcators are 
+ * ignored in calculating the SHA1-hash.
  */
 type UnsignedList struct {
+	Hash []byte
 	xc.BuildList
 }
 
@@ -171,11 +188,8 @@ func (bl *UnsignedList) GetPath(n uint) string {
 	return ptc.Path
 }
 
-func (bl *UnsignedList) String() (s string) {
+func (bl *UnsignedList) String() (s string, err error) {
 
-	var (
-		err error
-	)
 	title := bl.Strings()
 
 	// XXX POSSIBLY ADD timestamp

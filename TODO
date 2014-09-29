@@ -1,9 +1,19 @@
 xlCrypto_go/TODO
 
-2014-09-27
+2014-09-28
+    * rename SignedList SignedBList
+    * rename UnsignedList UnsignedBList
+
+    * extract ReadContents() from UnsignedList and SignedLists
+    * drop from BuildList
+    
+    * FIX: ParseSignedBList() not working because not in interface(!)
+
+2014-09-28 (-27, edited)
     * rearrange header so that 
-        - UnsignedBList is title, timestamp
-        - SignedBList is title, timestamp, publicKey
+        - BuildList is     Title, Timestamp, Content
+        - UnsignedBList is Hash, BuildList
+        - SignedBList is   PublicKey, DigSig, BuildList
 
 2014-09-26
     * consider putting timestamp back into BuildList struct

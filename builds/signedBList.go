@@ -26,22 +26,22 @@ var _ = fmt.Print
  * followed by a single space and then the file name, including the
  * path.  Lines end with CRLF.
  *
- * The hash for a serialized SignedList, its title key, is the 20-byte
- * BuildList hash, an SHA1-based function of the SignedList's title and
+ * The hash for a serialized SignedBList, its title key, is the 20-byte
+ * BuildList hash, an SHA1-based function of the SignedBList's title and
  * RSA public key.
  *
  * The digital signature in the last line is calculated from the
  * SHA1 digest of the header lines (public key, title, and timestamp
  * lines, each CRLF-terminated) and the content lines.
  */
-type SignedList struct {
+type SignedBList struct {
 	PubKey *rsa.PublicKey
 	DigSig []byte
 	xc.BuildList
 }
 
-func NewSignedList(title string, pubkey *rsa.PublicKey) (
-	sList *SignedList, err error) {
+func NewSignedBList(title string, pubkey *rsa.PublicKey) (
+	sList *SignedBList, err error) {
 
 	if pubkey == nil {
 		err = NilPublicKey
@@ -51,7 +51,7 @@ func NewSignedList(title string, pubkey *rsa.PublicKey) (
 		// timestamp is set when it gets signed
 		bList, err := xc.NewBuildList(title, 0)
 		if err == nil {
-			sList = &SignedList{
+			sList = &SignedBList{
 				PubKey:    pubkey,
 				BuildList: *bList,
 			}
@@ -70,64 +70,65 @@ func NewSignedList(title string, pubkey *rsa.PublicKey) (
  * The text of the line, excluding the line terminator, is
  * included in the digest.
  */
-func (bl *SignedList) ReadContents(in *bufio.Reader) (err error) {
-
-	for err == nil {
-		var (
-			hash, line []byte
-			path       string
-			item       *Item
-		)
-		line, err = xc.NextLineWithoutCRLF(in)
-		if err == nil || err == io.EOF {
-			if bytes.Equal(line, xc.CONTENT_END) {
-				break
-			} else {
-				// Parse the line.  We expect it to consist of a base64-
-				// encoded hash followed by a space followed by a POSIX
-				// path.
-				line = bytes.Trim(line, " \t")
-				if len(line) == 0 {
-					err = EmptyContentLine
-				} else {
-					parts := bytes.Split(line, SPACE_SEP)
-					if len(parts) != 2 {
-						err = IllFormedContentLine
-					} else {
-						var count int
-						e := base64.StdEncoding
-						maxLen := e.DecodedLen(len(parts[0]))
-						hash = make([]byte, maxLen)
-						count, err = e.Decode(hash, parts[0])
-						if err == nil {
-							path = string(parts[1])
-						}
-						hash = hash[:count]
-					}
-				}
-				if err == nil {
-					item, err = NewItem(hash, path)
-					if err == nil {
-						bl.Content = append(bl.Content, item)
-					}
-				}
-			}
-		}
-	}
-	return
-}
+//func (bl *SignedBList) ReadContents(in *bufio.Reader) (err error) {
+//
+//	for err == nil {
+//		var (
+//			hash, line []byte
+//			path       string
+//			item       *Item
+//		)
+//		line, err = xc.NextLineWithoutCRLF(in)
+//		if err == nil || err == io.EOF {
+//			if bytes.Equal(line, xc.CONTENT_END) {
+//				break
+//			} else {
+//				// Parse the line.  We expect it to consist of a base64-
+//				// encoded hash followed by a space followed by a POSIX
+//				// path.
+//				line = bytes.Trim(line, " \t")
+//				if len(line) == 0 {
+//					err = EmptyContentLine
+//				} else {
+//					parts := bytes.Split(line, SPACE_SEP)
+//					if len(parts) != 2 {
+//						err = IllFormedContentLine
+//					} else {
+//						var count int
+//						e := base64.StdEncoding
+//						maxLen := e.DecodedLen(len(parts[0]))
+//						hash = make([]byte, maxLen)
+//						count, err = e.Decode(hash, parts[0])
+//						if err == nil {
+//							path = string(parts[1])
+//						}
+//						hash = hash[:count]
+//					}
+//				}
+//				if err == nil {
+//					item, err = NewItem(hash, path)
+//					if err == nil {
+//						bl.Content = append(bl.Content, item)
+//					}
+//				}
+//			}
+//		}
+//	}
+//	return
+//}
 
 /**
  * Return the number of content lines
  */
-func (bl *SignedList) Size() uint {
+func (bl SignedBList) Size() uint {
 	return uint(len(bl.Content))
 }
 
 /**
  * Return the Nth content item in string form, without any CRLF.
  */
-func (bl *SignedList) Get(n uint) (s string, err error) {
+func (bl SignedBList) Get(n uint) (s string, err error) {
+
 	if n < 0 || bl.Size() <= n {
 		err = NdxOutOfRange
 	} else {
@@ -138,18 +139,18 @@ func (bl *SignedList) Get(n uint) (s string, err error) {
 }
 
 /**
- * Add a content line to the SignedList.  In string form, the
+ * Add a content line to the SignedBList.  In string form, the
  * content line begins with the extended hash of the Item
  * (the content hash if it is a data file) followed by a space
  * followed by the name of the Item.  If the name is a path,
  * the SEPARATOR character is a UNIX/Linux-style forward slash,
- * SignedList.SEPARATOR.
+ * SignedBList.SEPARATOR.
  *
  * @param hash  extended hash of Item, its file key
  * @param name  file or path name of Item
- * @return      reference to this SignedList, to ease chaining
+ * @return      reference to this SignedBList, to ease chaining
  */
-func (bl *SignedList) Add(hash []byte, name string) (err error) {
+func (bl *SignedBList) Add(hash []byte, name string) (err error) {
 
 	if bl.IsSigned() {
 		err = CantAddToSignedList
@@ -167,7 +168,7 @@ func (bl *SignedList) Add(hash []byte, name string) (err error) {
  * Return the SHA1 hash for the Nth Item.
  * XXX Should be modified to return a copy.
  */
-func (bl *SignedList) GetItemHash(n uint) []byte {
+func (bl *SignedBList) GetItemHash(n uint) []byte {
 	i := bl.Content[n].(*Item)
 	return i.EHash
 }
@@ -175,13 +176,13 @@ func (bl *SignedList) GetItemHash(n uint) []byte {
 /**
  * Returns the path + fileName for the Nth content line, in
  * a form usable with the operating system.  That is, the
- * SEPARATOR is File.SEPARATOR instead of SignedList.SEPARATOR,
+ * SEPARATOR is File.SEPARATOR instead of SignedBList.SEPARATOR,
  * if there is a difference.
  *
  * @param n content line
  * @return the path + file name for the Nth Item
  */
-func (bl *SignedList) GetPath(n uint) string {
+func (bl *SignedBList) GetPath(n uint) string {
 
 	// XXX NEEDS VALIDATION
 	i := bl.Content[n].(*Item)
@@ -190,15 +191,15 @@ func (bl *SignedList) GetPath(n uint) string {
 
 // DIG SIG //////////////////////////////////////////////////////////
 
-func (sl *SignedList) IsSigned() bool {
+func (sl *SignedBList) IsSigned() bool {
 	return len(sl.DigSig) > 0
 }
 
-func (sl *SignedList) GetDigSig() []byte {
+func (sl *SignedBList) GetDigSig() []byte {
 	return sl.DigSig
 }
 
-func (sl *SignedList) SetDigSig(val []byte) {
+func (sl *SignedBList) SetDigSig(val []byte) {
 	// XXX NEEDS BETTER VALIDATION
 	sl.DigSig = make([]byte, len(val))
 	copy(sl.DigSig, val)
@@ -212,7 +213,7 @@ func (sl *SignedList) SetDigSig(val []byte) {
  *
  * @param key RSAKey whose secret materials are used to sign
  */
-func (sl *SignedList) Sign(skPriv *rsa.PrivateKey) (err error) {
+func (sl *SignedBList) Sign(skPriv *rsa.PrivateKey) (err error) {
 
 	var (
 		digSig, hash []byte
@@ -243,7 +244,7 @@ func (sl *SignedList) Sign(skPriv *rsa.PrivateKey) (err error) {
  * Verify that the BuildList agrees with its digital signature,
  * returning nil if it is correct and an appropriate error otherwise.
  */
-func (sl *SignedList) Verify() (err error) {
+func (sl *SignedBList) Verify() (err error) {
 
 	var hash []byte
 
@@ -261,7 +262,7 @@ func (sl *SignedList) Verify() (err error) {
 // DOCUMENT HASH ////////////////////////////////////////////////////
 
 /**
- * Return this SignedList's SHA1 hash, a byte array 20 bytes
+ * Return this SignedBList's SHA1 hash, a byte array 20 bytes
  * long.  The hash is over first the public key in its 'wire' form
  * and then over the title.
  *
@@ -269,7 +270,7 @@ func (sl *SignedList) Verify() (err error) {
  * the two must be reconciled.
  */
 
-func (sl *SignedList) GetHash() []byte {
+func (sl SignedBList) GetHash() []byte {
 
 	d := sha1.New()
 
@@ -283,7 +284,7 @@ func (sl *SignedList) GetHash() []byte {
 
 // SERIALIZATION ////////////////////////////////////////////////////
 
-func (sList *SignedList) String() (s string, err error) {
+func (sList SignedBList) String() (s string, err error) {
 
 	if sList.PubKey == nil {
 		err = NilPublicKey
@@ -324,7 +325,7 @@ func (sList *SignedList) String() (s string, err error) {
  *
  * PANICS if bl.PubKey is nil.
  */
-func (bl *SignedList) Strings() (title, timestamp, pk string) {
+func (bl *SignedBList) Strings() (title, timestamp, pk string) {
 
 	// title ------------------------------------------
 	title = bl.Title
@@ -341,14 +342,14 @@ func (bl *SignedList) Strings() (title, timestamp, pk string) {
 
 // PARSE/DESERIALIZATION ////////////////////////////////////////////
 
-//func ParseSignedList(in io.Reader) (sList *SignedList, err error) {
+//func ParseSignedBList(in io.Reader) (sList *SignedBList, err error) {
 //	var (
 //		digSig, line []byte
 //	)
 //	bin := bufio.NewReader(in)
 //	bList, err := xc.ParseBuildList(bin)
 //	if err == nil {
-//		sList = &SignedList{BuildList: *bList}
+//		sList = &SignedBList{BuildList: *bList}
 //		err = sList.ReadContents(bin)
 //		if err == nil {
 //			// try to read the digital signature line
@@ -373,7 +374,7 @@ func (bl *SignedList) Strings() (title, timestamp, pk string) {
 // of the subclass struct.  If the subclass is an XXXList, then expect
 // the calling routine to be ParseXXXList()
 //
-func ParseSignedList(in io.Reader) (sList *SignedList, err error) {
+func ParseSignedBList(in io.Reader) (sList *SignedBList, err error) {
 
 	var (
 		line   []byte
@@ -408,16 +409,17 @@ func ParseSignedList(in io.Reader) (sList *SignedList, err error) {
 		}
 	}
 
-	// Build and populate the SignedList object ---------------------
+	// Build and populate the SignedBList object ---------------------
 	if err == nil {
 		var bList *xc.BuildList
 		bList, err = xc.NewBuildList(title, t)
 		if err == nil {
-			sList = &SignedList{
+			sList = &SignedBList{
 				PubKey:    pubKey,
 				BuildList: *bList,
 			}
 			// Read the content lines and then the dig sig ----------
+			//err = ZReadContents(bin, sList, true)	// true = is signed
 			err = sList.ReadContents(bin)
 			if err == nil {
 				// try to read the digital signature line
