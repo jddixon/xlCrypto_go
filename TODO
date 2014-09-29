@@ -1,22 +1,26 @@
 xlCrypto_go/TODO
 
-2014-09-28
-    * rename SignedList SignedBList
-    * rename UnsignedList UnsignedBList
+2014-09-29
+    * ReadContent: need to type check what's added to 
+        BuildList.Content
 
-    * extract ReadContents() from UnsignedList and SignedLists
-    * drop from BuildList
-    
-    * FIX: ParseSignedBList() not working because not in interface(!)
+2014-09-28
+    * rename SignedList SignedBList                                     * DONE
+    * rename UnsignedList UnsignedBList                                 * DONE
+    * extract ReadContents() from UnsignedList and SignedLists          * DONE
+    * drop from BuildList                                               * DONE
+    * FIX: ParseSignedBList() not working because not in interface(!)   * DONE
+    * FIX: misuse of value receivers in buildListI.go (should all be    * DONE
+        pointer receivers)                                              * DONE
 
 2014-09-28 (-27, edited)
-    * rearrange header so that 
-        - BuildList is     Title, Timestamp, Content
-        - UnsignedBList is Hash, BuildList
-        - SignedBList is   PublicKey, DigSig, BuildList
+    * rearrange header so that 						                    * DONE
+        - BuildList is     Title, Timestamp, Content					* DONE
+        - UnsignedBList is Hash, BuildList				        		* DONE
+        - SignedBList is   PublicKey, DigSig, BuildList					* DONE
 
 2014-09-26
-    * consider putting timestamp back into BuildList struct
+    * consider putting timestamp back into BuildList struct             * DONE
         - plus a SetTime() call for UnsignedList 
         - and EncryptedUnsignedList
 

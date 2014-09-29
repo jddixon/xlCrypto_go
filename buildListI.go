@@ -3,8 +3,8 @@ package crypto
 // xlatttice_go/crypto/signedListI.go
 
 import (
-	//"bufio"
-	//"crypto/rsa"
+//"bufio"
+//"crypto/rsa"
 )
 
 /**
@@ -31,6 +31,7 @@ import (
  */
 
 type BuildListI interface {
+	GetContent() *[]interface{}
 
 	/** @return a clone of the public key */
 	//GetPublicKey() *rsa.PublicKey

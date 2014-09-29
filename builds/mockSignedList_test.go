@@ -87,6 +87,10 @@ func (msl *MockBuildList) Size() uint {
 	return uint(len(msl.Content))
 }
 
+func (msl *MockBuildList) Strings() string {
+	return msl.Title
+}
+
 /**
  * Serialize the entire document.  All lines are CRLF-terminated.
  * If any error is encountered, this function silently returns an
@@ -98,7 +102,7 @@ func (msl *MockBuildList) String() (s string) {
 		err error
 		ss  []string
 	)
-	title := msl.BuildList.Strings()
+	title := msl.Strings()
 	ss = append(ss, title)
 
 	// content lines ----------------------------------

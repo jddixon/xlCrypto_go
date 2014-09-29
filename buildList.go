@@ -45,7 +45,7 @@ var (
 
 type BuildList struct {
 	Title     string
-	Timestamp xu.Timestamp // set when signed
+	Timestamp xu.Timestamp  // set when signed
 	Content   []interface{} // []ItemI
 }
 
@@ -65,7 +65,11 @@ func NewBuildList(title string, timestamp xu.Timestamp) (
 
 // PROPERTIES ///////////////////////////////////////////////////
 
-func (bl BuildList) GetTitle() string {
+func (bl *BuildList) GetContent() *[]interface{} {
+	return &bl.Content
+}
+
+func (bl *BuildList) GetTitle() string {
 	return bl.Title
 }
 
@@ -80,7 +84,7 @@ func (bl BuildList) GetTitle() string {
  * the two must be reconciled.
  */
 
-func (bl BuildList) GetHash() []byte {
+func (bl *BuildList) GetHash() []byte {
 
 	d := sha1.New()
 
@@ -95,7 +99,7 @@ func (bl BuildList) GetHash() []byte {
  *
  * @return the number of content items
  */
-func (bl BuildList) Size() (size uint) {
+func (bl *BuildList) Size() (size uint) {
 	// SUBCLASS MUST IMPLEMENT
 	return
 }
@@ -133,38 +137,12 @@ func (bl *BuildList) HashBody() (hash []byte, err error) {
 // SERIALIZATION ////////////////////////////////////////////////
 
 /**
- * Serialize the document header.  All lines are CRLF-terminated.
- * Subclasses are responsible for formatting their content lines,
- * without any termination.  If any error is encountered, this
- * function silently returns an empty string.
- */
-func (bl *BuildList) Strings() (title string) {
-
-	// title ------------------------------------------
-	title = bl.Title
-
-	return
-}
-
-/**
  * Return the Nth content item in String form, without any terminating CRLF.
  * Using code should permit the implementation to return io.EOF either
  * with the last valid line or an empty string and io.EOF on subsequent
  * calls.
  */
-func (bl BuildList) Get(n uint) (s string, err error) {
-
-	/* SUBCLASSES MUST IMPLEMENT */
-
-	err = NotImplemented
-	return
-}
-
-/**
- * Reads in content lines, stripping off line endings, storing the
- * line in a subclass-defined internal buffer (conventionally "content").
- */
-func (bl *BuildList) ReadContents(*bufio.Reader) (err error) {
+func (bl *BuildList) Get(n uint) (s string, err error) {
 
 	/* SUBCLASSES MUST IMPLEMENT */
 

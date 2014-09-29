@@ -21,17 +21,19 @@ var _ = fmt.Print
  * The text of the line, excluding the line terminator, is
  * included in the digest.
  */
-func ZReadContents(in *bufio.Reader, bList xc.BuildListI, isSigned bool) (
+func ReadContents(in *bufio.Reader, bList xc.BuildListI, isSigned bool) (
 	err error) {
 
-	// XXX DUMB 
+	// XXX NONSENSE
 	var bl xc.BuildListI
 	if isSigned {
-		bl = bList.(SignedBList)
+		bl = bList.(*SignedBList)
 	} else {
-		bl = bList.(*UnsignedList)
+		bl = bList.(*UnsignedBList)
 	}
-		
+	// END NONSENSE
+
+	content := bl.GetContent()
 	for err == nil {
 		var (
 			hash, line []byte
@@ -62,18 +64,14 @@ func ZReadContents(in *bufio.Reader, bList xc.BuildListI, isSigned bool) (
 						if err == nil {
 							path = string(parts[1])
 						}
-						
-						
-						
+
 						hash = hash[:count]
 					}
 				}
 				if err == nil {
 					item, err = NewItem(hash, path)
 					if err == nil {
-						// XXX WORKING HERE
-						// bl.Content = append(bl.Content, item)
-						_,_ = bl, item
+						*content = append(*content, item)
 					}
 				}
 			}
