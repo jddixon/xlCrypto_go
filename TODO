@@ -1,5 +1,9 @@
 xlCrypto_go/TODO
 
+2014-12-17
+    * review adding support for SHA256, SHA3
+    * use SHAx_BIN_LEN from xlUtil_go/const.go                          * DONE
+
 2014-09-29
     * ReadContent: need to type check what's added to 
         BuildList.Content

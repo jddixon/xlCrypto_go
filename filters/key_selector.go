@@ -2,7 +2,7 @@ package filters
 
 import (
 	"fmt"
-	xc "github.com/jddixon/xlCrypto_go"
+	xu "github.com/jddixon/xlUtil_go"
 )
 
 var _ = fmt.Print
@@ -65,7 +65,7 @@ func NewKeySelector(m, k uint, b []byte) (
 func (ks *KeySelector) getOffsets(key []byte) (err error) {
 	if key == nil {
 		err = NilKey
-		if err == nil && len(key) < xc.SHA1_LEN {
+		if err == nil && len(key) < xu.SHA1_BIN_LEN {
 			err = KeyTooShort
 		}
 	}

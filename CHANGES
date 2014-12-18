@@ -1,5 +1,9 @@
 xlCrypto_go/CHANGES
 
+v0.6.0
+    2014-12-17
+        * use symbolic constants for SHAx_BIN_LEN etc from 
+            xlUtil_go in filters/ and builds/                       SLOC 2285
 v0.5.1
     2014-10-09
         * previous API changes: SignedList -> SignedBList, etc

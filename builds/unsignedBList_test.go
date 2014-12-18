@@ -7,7 +7,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	xr "github.com/jddixon/rnglib_go"
-	xc "github.com/jddixon/xlCrypto_go"
 	xu "github.com/jddixon/xlUtil_go"
 	. "launchpad.net/gocheck"
 	"strings"
@@ -45,10 +44,10 @@ func (s *XLSuite) TestGeneratedUnsignedBList(c *C) {
 	)
 	rng := xr.MakeSimpleRNG()
 
-	hash0 := make([]byte, xc.SHA1_BYTE_LEN)
-	hash1 := make([]byte, xc.SHA1_BYTE_LEN)
-	hash2 := make([]byte, xc.SHA1_BYTE_LEN)
-	hash3 := make([]byte, xc.SHA1_BYTE_LEN)
+	hash0 := make([]byte, xu.SHA1_BIN_LEN)
+	hash1 := make([]byte, xu.SHA1_BIN_LEN)
+	hash2 := make([]byte, xu.SHA1_BIN_LEN)
+	hash3 := make([]byte, xu.SHA1_BIN_LEN)
 	rng.NextBytes(hash0)
 	rng.NextBytes(hash1)
 	rng.NextBytes(hash2)
