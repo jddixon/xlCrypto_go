@@ -1,5 +1,12 @@
 xlCrypto_go/TODO
 
+2015-04-17
+    * write aes_test.go to exercise AES CBC and use of IV               * DONE
+
+2015-04-12
+    * Java specs clearly require blank line before dig sig; not
+        present here
+    * digsig should also be folded
 2014-12-17
     * review adding support for SHA256, SHA3
     * use SHAx_BIN_LEN from xlUtil_go/const.go                          * DONE

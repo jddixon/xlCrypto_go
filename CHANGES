@@ -1,5 +1,8 @@
 xlCrypto_go/CHANGES
 
+v0.6.1
+    2015-04-17
+        * add aes_cbc_test.go as a working example                  SLOC 2339
 v0.6.0
     2014-12-17
         * use symbolic constants for SHAx_BIN_LEN etc from 
