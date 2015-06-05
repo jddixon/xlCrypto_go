@@ -382,4 +382,3 @@ func (sl *SignedBList) calcDocHash() []byte {
 	}
 	return d.Sum(nil)
 }
-

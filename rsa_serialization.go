@@ -7,6 +7,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
+	"errors"
 	"fmt"
 )
 
@@ -40,7 +41,7 @@ func RSAPrivateKeyFromWire(data []byte) (key *rsa.PrivateKey, err error) {
 	return x509.ParsePKCS1PrivateKey(data)
 }
 
-// CONVERSION TO AND FROM DISK FORMAT ///////////////////////////////
+// CONVERSION TO AND FROM SSH FORMAT ////////////////////////////////
 
 // Serialize an RSA public key to disk format, specifically to the
 // format used by SSH. Should return nil if the conversion fails.
@@ -65,8 +66,20 @@ func RSAPubKeyFromDisk(data []byte) (*rsa.PublicKey, error) {
 	}
 }
 
+// DEPRECATED ///////////////////////////////////////////////////////
+func RSAPrivateKeyToDisk(privKey *rsa.PrivateKey) ([]byte, error) {
+	return RSAPrivateKeyToPEM(privKey)
+}
+func RSAPrivateKeyFromDisk(data []byte) (key *rsa.PrivateKey, err error) {
+	return RSAPrivateKeyFromPEM(data)
+}
+
+// CONVERSION TO AND FROM PEM FORMAT ////////////////////////////////
+
 // Serialize an RSA private key to disk format
-func RSAPrivateKeyToDisk(privKey *rsa.PrivateKey) (data []byte, err error) {
+func RSAPrivateKeyToPEM(
+	privKey *rsa.PrivateKey) (data []byte, err error) {
+
 	if privKey == nil {
 		err = NilData
 	} else {
@@ -82,7 +95,9 @@ func RSAPrivateKeyToDisk(privKey *rsa.PrivateKey) (data []byte, err error) {
 }
 
 // Deserialize an RSA private key from disk format
-func RSAPrivateKeyFromDisk(data []byte) (key *rsa.PrivateKey, err error) {
+func RSAPrivateKeyFromPEM(data []byte) (
+	key *rsa.PrivateKey, err error) {
+
 	if data == nil {
 		err = NilData
 	} else {
@@ -91,6 +106,42 @@ func RSAPrivateKeyFromDisk(data []byte) (key *rsa.PrivateKey, err error) {
 			err = PemEncodeDecodeFailure
 		} else {
 			key, err = x509.ParsePKCS1PrivateKey(block.Bytes)
+		}
+	}
+	return
+}
+
+// Serialize an RSA public key to PEM format.
+func RSAPubKeyToPEM(rsaPubKey *rsa.PublicKey) (out []byte, err error) {
+	pubDer, err := RSAPubKeyToWire(rsaPubKey)
+	if err == nil {
+		blk := pem.Block{
+			Type:  "PUBLIC KEY",
+			Bytes: pubDer,
+		}
+		out = pem.EncodeToMemory(&blk)
+	}
+	return
+}
+
+// Deserialize an RSA public key from PEM format.
+func RSAPubKeyFromPEM(data []byte) (pk *rsa.PublicKey, err error) {
+	// extract the PEM block
+	blk, rest := pem.Decode(data)
+	_ = rest
+
+	// if extraction succeeded, blk.bytes should contain the DER
+	if blk != nil {
+		obj, err := x509.ParsePKIXPublicKey(blk.Bytes)
+		if err == nil {
+			switch t := obj.(type) {
+			default:
+				msg := fmt.Sprintf(
+					"expected RSA public key, got %v", t)
+				err = errors.New(msg)
+			case *rsa.PublicKey:
+				pk = obj.(*rsa.PublicKey)
+			}
 		}
 	}
 	return

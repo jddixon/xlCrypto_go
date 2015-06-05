@@ -1,7 +1,13 @@
 xlCrypto_go/TODO
 
+2015-06-04
+    * RSA key serialization should use PEM format
+        - transition needs to be done with care
+
 2015-04-17
     * write aes_test.go to exercise AES CBC and use of IV               * DONE
+    * write similar oaep_test.go, extracting code from 
+        xlProtocol_go/aes_cnx
 
 2015-04-12
     * Java specs clearly require blank line before dig sig; not
@@ -62,7 +68,9 @@ xlCrypto_go/TODO
         attempts to use a simple string as a content line but           * DONE
         ItemI need GetHash(), GetPath()                                 * DONE
 
-2014-05-14 (SPLIT OFF FROM xlattice_go)
+== SPLIT OFF FROM xlattice_go =======================================
+
+2014-05-14
     * use rnglib_go instead of xlattice_go/rnglib                       * DONE
     * use xlUtil_go instead of xlattice_go/util                         * DONE
     * whatever creates filter/tmp/ must create as readable !            * DONE
