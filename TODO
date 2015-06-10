@@ -1,5 +1,8 @@
 xlCrypto_go/TODO
 
+2015-06-10
+    * need test(s) for NextNBLine(), CollectPEMRSAPublicKey
+    * need code for CollectPEMRSAPrivateKey
 2015-06-04
     * RSA key serialization should use PEM format
         - transition needs to be done with care
