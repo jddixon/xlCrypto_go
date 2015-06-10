@@ -1,5 +1,9 @@
 xlCrypto_go/CHANGES
 
+v0.6.3
+    2015-06-10
+        * move NextNBLine, CollectPEMRSAPublicKey here from 
+            xlNode_go/baseNode.go                                   SLOC 2442
 v0.6.2
     2015-06-05
         * RSA pubkey serialization to/from PEM                      SLOC 2400
