@@ -9,9 +9,42 @@
 </head>
 <body>
 <div class="content">
-<h1 class="libTop">xlCrypto_go</h1>
+<h1 class="libTop">xlCrypto</h1>
 
-<p>The crypto library for xlattice_go.</p>
+<p>The crypto library for
+<a href="https://jddixon.github.io/xlattice_go">xlattice_go.</a></p>
+
+<p>The library contains functions for</p>
+
+<ul>
+<li>an implementation of the XLattice <strong>BuildList</strong>, a tool for describing and verifying the integrity of files systems</li>
+<li>PKCS7 padding</li>
+<li>RSA public and private key serialization and deserialization</li>
+<li>RSA/SHA1 digital signatures</li>
+</ul>
+
+<h1>BuildList</h1>
+
+<p>A <strong>BuildList</strong> consists of</p>
+
+<ul>
+<li>a serialized RSA public key</li>
+<li>a title</li>
+<li>a date in a standardized format</li>
+
+<li><p>a number of content lines preceded and followed by <code># BEGIN CONTENT</code> and <code># END CONTENT #</code> lines</p>
+
+<h1>optionally a digital signature</h1></li>
+</ul>
+
+<p>The content lines consist of an indented list of the directory tree
+involved, with the names of files and subdirectories in a directory
+indented one space deeper than their parent.  File names are accompanied
+by their SHA hash as a hex string.</p>
+
+<h1>Project Status</h1>
+
+<p>Stable although skeletal.  All tests succeed.</p>
 
 <h2>Licensing</h2>
 <p><a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />The material on this github.io website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.</p>
