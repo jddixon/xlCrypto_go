@@ -1,5 +1,16 @@
 xlCrypto_go/TODO
 
+2015-09-26
+    * URGENT: need BuildList executable 
+    * executable command line options should match those for Python 
+        version and be a close as possible to Java options
+
+2015-09-25
+    * add example of (short) signed BuildList to README.md
+    * need to make this version of BuildList, the Java 
+        version, and the Python version operate identically (whereas
+        currently the first two use MerkleTrees, the last NLHTrees)
+
 2015-06-10
     * need test(s) for NextNBLine(), CollectPEMRSAPublicKey
     * need code for CollectPEMRSAPrivateKey
