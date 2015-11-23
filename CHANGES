@@ -1,5 +1,8 @@
 xlCrypto_go/CHANGES
 
+v0.6.5
+    2015-11-23
+        * minor edits to *.md                                       SLOC 2442
 v0.6.4
     2015-09-24
         * expanded docs a bit, spec'ed out further changes
