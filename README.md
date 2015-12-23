@@ -32,4 +32,4 @@ Stable although skeletal.  All tests succeed.
 ## On-line Documentation
 
 More information on the **xlCrypto_go** project can be found
-[here](://jddixon.github.io/xlCrypto_go)
+[here](https://jddixon.github.io/xlCrypto_go)
