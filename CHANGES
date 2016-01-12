@@ -1,5 +1,8 @@
 xlCrypto_go/CHANGES
 
+v0.6.7
+    2016-01-12
+        * fixed imports from code.google.com                        SLOC 2442
 v0.6.6
     2015-12-23
         * fix dead link
@@ -31,4 +34,5 @@ v0.5.1
 v0.5.0
     2014-05-14 
         * split off from xlattice_go                                SLOC 2152
+
 

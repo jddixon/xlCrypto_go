@@ -3,7 +3,8 @@ package crypto
 // xlCrypto_go/rsa_serialization.go
 
 import (
-	"code.google.com/p/go.crypto/ssh"
+	//"code.google.com/p/go.crypto/ssh"
+	"golang.org/x/crypto/ssh"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
