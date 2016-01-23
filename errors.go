@@ -10,7 +10,7 @@ var (
 	//EmptyHash               = e.New("empty hash slice parameter")
 	//EmptyPath               = e.New("empty path parameter")
 	EmptyTitle              = e.New("empty title parameter")
-	ExhaustedStringArray = e.New("exhausted string array")
+	ExhaustedStringArray    = e.New("exhausted string array")
 	ImpossibleBlockSize     = e.New("impossible block size")
 	IncorrectPKCS7Padding   = e.New("incorrectly padded data")
 	MissingContentStart     = e.New("missing CONTENT START line")

@@ -5,7 +5,7 @@ package filters
 import (
 	"fmt" // DEBUG
 	xr "github.com/jddixon/rnglib_go"
-	. "launchpad.net/gocheck"
+	. "gopkg.in/check.v1"
 )
 
 var _ = fmt.Print

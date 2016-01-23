@@ -6,7 +6,7 @@ import (
 	"fmt"
 	xr "github.com/jddixon/rnglib_go"
 	xf "github.com/jddixon/xlUtil_go/lfs"
-	. "launchpad.net/gocheck"
+	. "gopkg.in/check.v1"
 	"os"
 )
 

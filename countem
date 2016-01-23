@@ -1,0 +1,9 @@
+cd ~/dev/go/src/github.com/jddixon/xlCrypto_go
+
+rm -rf filters/tmp/*
+gofmt -w .
+
+pySloc -v -X '\.bak$|\.dat$|^junk|\.swp$|^tmp$' $@      \
+    bash:countem    \
+
+

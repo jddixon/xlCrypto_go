@@ -22,9 +22,9 @@ func NextNBLine(lines *[]string) (s string, err error) {
 	return
 }
 
-// Given the opening line of the PEM serializaton of an RSA Public Key, 
+// Given the opening line of the PEM serializaton of an RSA Public Key,
 // and a pointer to an array of strings which should begin with the rest
-// of the PEM serialization, return the entire PEM serialization as a 
+// of the PEM serialization, return the entire PEM serialization as a
 // single string.
 func CollectPEMRSAPublicKey(s string, ss *[]string) (what []byte, err error) {
 
@@ -48,4 +48,4 @@ func CollectPEMRSAPublicKey(s string, ss *[]string) (what []byte, err error) {
 		what = []byte(strings.Join(x, "\n"))
 	}
 	return
-} 
+}

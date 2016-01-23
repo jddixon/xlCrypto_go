@@ -1,5 +1,8 @@
 xlCrypto_go/TODO
 
+2016-01-23
+    * replace launchpad's gocheck with gopkg.in/check.v1                * DONE
+
 2015-09-26
     * URGENT: need BuildList executable 
     * executable command line options should match those for Python 

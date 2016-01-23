@@ -3,7 +3,6 @@ package crypto
 // xlCrypto_go/rsa_test.go
 
 import (
-	//. "launchpad.net/gocheck"
 	. "gopkg.in/check.v1"
 	"math/big"
 )

@@ -4,7 +4,7 @@ package filters
 
 import (
 	"fmt" // DEBUG
-	. "launchpad.net/gocheck"
+	. "gopkg.in/check.v1"
 )
 
 // Bloom filters for sets whose members are SHA3 digests.

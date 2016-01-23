@@ -5,11 +5,11 @@ package crypto
 import (
 	"bytes"
 	//"code.google.com/p/go.crypto/ssh"
-	"golang.org/x/crypto/ssh"
 	"crypto/rsa"
 	"encoding/base64"
 	"encoding/binary"
 	"fmt"
+	"golang.org/x/crypto/ssh"
 	"math/big"
 )
 
