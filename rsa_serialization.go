@@ -4,12 +4,12 @@ package crypto
 
 import (
 	//"code.google.com/p/go.crypto/ssh"
-	"golang.org/x/crypto/ssh"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"golang.org/x/crypto/ssh"
 )
 
 var _ = fmt.Print

@@ -6,7 +6,6 @@ import (
 	"crypto/aes"
 	xr "github.com/jddixon/rnglib_go"
 	. "gopkg.in/check.v1"
-	//. "launchpad.net/gocheck"
 )
 
 func (s *XLSuite) TestPKCS7Padding(c *C) {

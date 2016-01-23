@@ -10,7 +10,7 @@ import (
 	"fmt"
 	xr "github.com/jddixon/rnglib_go"
 	xu "github.com/jddixon/xlUtil_go"
-	. "launchpad.net/gocheck"
+	. "gopkg.in/check.v1"
 	"strings"
 )
 

@@ -1,5 +1,8 @@
 xlCrypto_go/CHANGES
 
+v0.6.8
+    2016-01-23
+        * add countem; use gopkg.in/check.v1 for testing            SLOC 2446
 v0.6.7
     2016-01-12
         * fixed imports from code.google.com                        SLOC 2442
@@ -34,5 +37,6 @@ v0.5.1
 v0.5.0
     2014-05-14 
         * split off from xlattice_go                                SLOC 2152
+
 
 
