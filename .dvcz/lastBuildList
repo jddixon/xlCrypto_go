@@ -7,17 +7,19 @@ zPjEShF9rvcNa9XEy1dKpcDz9Szbm2SlxOgM83fDDGtOq4SSCSqndtxrOvXXPB57
 H1mJV/FmerbXRPm5ERJVNIxtLk7Gr2Ce45FVlWyJGMhpfVlKkkk+bRQ02OFfazJI
 GQIDAQAB
 -----END RSA PUBLIC KEY-----
-xlCrypto_go v0.6.10
-2016-06-05 03:39:57
+xlCrypto_go v0.6.11
+2016-07-03 19:39:32
 # START CONTENT #
 xlCrypto_go
  .copyright 803f3e50518123ef8a08d34f2238e89b62d0c9a2
  .dvcz
-  projCfg 9d0dd1e99b69ea620a744e4ba8938012f761a6ab
+  builds 4202f11ed5121766875c838398a77f08add08d00
+  lastBuildList ea9ff644393a076a9982d1812a982c785ed875a0
+  projCfg 0a001acb72800fb1863f1915277f5a465ee1a4a6
   projCfg.local e39aba91cba65e3ee81f39bc106235a2d4538840
-  version d9e9a250dc543f0a3148ffa45c935c0c38c076cc
- .gitignore 88549a39e8e421b4ac75aee4ada67ed12a14b4c4
- CHANGES e72ee2c86061feb872460386f3cab102bbbb85d4
+  version 8eab435a5f917ba6a45fe758b66978bec9bc3e32
+ .gitignore ec0f9002629753cd248c6a672ef3de695c30f4b7
+ CHANGES 80ec89f89b7ca77111698065953537900dd0056c
  LICENSE.md d1cecfadc47b23486f6bc8a863cfdde348c3eb46
  README.LICENSE.ssh f6bf62edfa6372b3711fc97684cf442225aeb568
  README.md d2ac6583f6aa80bda842d2029a9a6ffe382591e3
@@ -59,6 +61,19 @@ xlCrypto_go
   nibbleCounters.go a16085e64737b896215de1ac16fe16f86b30c5aa
   nibbleCounters_test.go b3cf4f5a906acbe0bf712a58bae8b915fef733c9
  ghpDoc
+  css
+   LICENSE.html5-boilerplate.md ded771b3245b190da0e81c76de5a80d41392c0a6
+   ghp.css 1d6ebe8a6cf8f61f4645a793cb087dfae2420f33
+   main.css 018ed80b8a6e6607bc7c08595fa5a7fa56853885
+   normalize.css cba40c7ce3d558d00ff79d7505ac3d348015ec9c
+  img
+   GitHub-Mark-32px.png fabe53eb72f9b6d3d47cd95aff31ffc45c2fdbf8
+   chunk.jpg de2b27e41f1547fc14b13399f5906b4303b49657
+   chunk2.jpg d0593d312dbb8ea837c17b28cb639726e29ea93b
+   cluster-with-clients.jpg c167d04c0c6b5736ef9fe4cdc3fcce1956fdea78
+   simple-cluster.jpg 6b223ddd25937c1ef75ef328f36fc3436f10bd62
+   xl-registration.jpg 15cbf951f9db173a45428b32dcec87aca83bbdf0
+   xlattice-2014.jpg f185aaad06db71acd9454f31054c62c56d36f37f
   index.md c98d73d9b6d0c3bc236731bcf14395d06995765a
  gocheck_test.go 92782d19919924efb47c8eee3c5406e11a1fc9e7
  installit fecc3139bd275830a2dc84061763219d21bb652e
@@ -75,7 +90,7 @@ xlCrypto_go
  sigverifierI.go a6b3ca929c40dd494e01e683a9a3daa24d3d7049
  styleit 442fe59458f4895a899af3903e19986488926f4c
  test.all 662c0343a9458187ee5c8a248cffa551f060f955
- version.go 7a4da2b133790d12b84ac2bc03a97746e5837970
+ version.go a09f19d86cb4f15f9751453d82e06929f19f56c6
 # END CONTENT #
 
-cqf43Mla4sZbnwFRhX5PdIjFAsu1EkT2j52f82tZ5fUoKqWwJreegDr5mJZEjNzxNV9J2D0q5pUmOuCMHEDRmkIo4qFXhysav/amTb/OBvPQmCZChv0LMyke4W4HdwhwwbUw4hYH8wHxJJ9/NOQnBz7qLG4WMEUwPv/HcaForgeyGh+gzcIupqRzCBIJmAhiLucuApBS74Q3W26O6X7aqI4ukM5zfc++MOJ+i3+/hTByf8UnAenna28Rvr9x1QqmlXygW07ItyvrGUW7nR7Ad77cZepcp+ZTyoVjqMRHYoBxUcTqUBWnhAxwwmXFaMFOG7Rtg2XCgjBE4m+uI2wTgw==
+MJgrxuhCRhSADQJxVfT/Um4de3cSuES7wU3vuL8Vzi4xr2n67HmqAMLAaThYjGDosV0aeG6PQVHFEBJp+9JxVxgxsI3nr1Wx3xmq5FkjAOE1W2mD8vQ7mTKNp17kMW1sRF/Z/Kt7xE6Flh3/QnPluE52KaDJFfANs1NhuW/Sqx0MTdNMuZHrQN7ihhDPYd8966UNuhxWmXfdQVGNCuh4ket8qPk+3mjln/qZGlSDaCekMdkHHjWmr4fuLLBORPN3ivTnZnDGqnCdvel8jnO+I0ETt1SkXaorFJvbESJU6EBsHzTIKNsoG2mFNeC2nrKJs/nBk/hBlWjO7cE6kJ5FyA==
