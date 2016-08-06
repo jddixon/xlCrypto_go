@@ -17,13 +17,14 @@
 <p>The library contains functions for</p>
 
 <ul>
-<li>an implementation of the XLattice <strong>BuildList</strong>, a tool for describing and verifying the integrity of files systems</li>
+<li>an implementation of the XLattice <strong>BuildList</strong>
+, a tool for describing and verifying the integrity of files systems</li>
 <li>PKCS7 padding</li>
 <li>RSA public and private key serialization and deserialization</li>
 <li>RSA/SHA1 digital signatures</li>
 </ul>
 
-<h1>BuildList</h1>
+<h2>BuildList</h2>
 
 <p>A <strong>BuildList</strong> consists of</p>
 
@@ -31,16 +32,19 @@
 <li>a serialized RSA public key</li>
 <li>a title</li>
 <li>a date in a standardized format</li>
-
-<li><p>a number of content lines preceded and followed by <code># BEGIN CONTENT</code> and <code># END CONTENT #</code> lines</p>
-
-<h1>optionally a digital signature</h1></li>
+<li>a number of content lines preceded and followed by <code># BEGIN CONTENT</code> and <code># END CONTENT #</code> lines</li>
+<li>optionally a digital signature</li>
 </ul>
 
 <p>The content lines consist of an indented list of the directory tree
 involved, with the names of files and subdirectories in a directory
 indented one space deeper than their parent.  File names are accompanied
-by their SHA hash as a hex string.</p>
+by their SHA hash as a hex string. See the
+<a href="https://jddixon.github.io/nlhtree_py">NLHTree specs</a>
+specs for more information on this encoding scheme.:</p>
+
+<p>For more detail on the XLattice BuildList look
+<a href="https://jddixon.github.io/xlattice/buildList.html">here</a>.</p>
 
 <h1>Project Status</h1>
 
