@@ -1,3 +1,5 @@
 # xlCrypto_go/.dvcz/projCfg.local
 
 dir:clr:filters/tmp
+
+txt:std:LICENSE-MIT.md

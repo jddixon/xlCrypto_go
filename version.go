@@ -1,6 +1,6 @@
 package crypto
 
 const (
-	VERSION      = "0.6.12"
-	VERSION_DATE = "2016-08-06"
+	VERSION      = "0.6.13"
+	VERSION_DATE = "2016-09-19"
 )
