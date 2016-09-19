@@ -1,5 +1,9 @@
 xlCrypto_go/TODO
 
+2016-08-06
+    * put Python BuildList example in a public place, demonstrate
+        interoperability with Go code
+
 2016-01-23
     * replace launchpad's gocheck with gopkg.in/check.v1                * DONE
 
