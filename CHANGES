@@ -1,5 +1,11 @@
 xlCrypto_go/CHANGES
 
+v0.6.15
+    2017-11-13
+        * correct directory structure, config files                 SLOC 3122
+v0.6.14
+    2017-05-24
+        * add projConfig.toml                                       SLOC 3123
 v0.6.13
     2016-09-19
         * standardize licensing                                     SLOC 3116
@@ -52,6 +58,8 @@ v0.5.1
 v0.5.0
     2014-05-14 
         * split off from xlattice_go                                SLOC 2152
+
+
 
 
 
